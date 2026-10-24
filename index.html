@@ -1216,8 +1216,14 @@
     Reveal.on("ready", layoutPass);
     Reveal.on("resize", layoutPass);
 
-    function navPrev() { Reveal.prev(); }
-    function navNext() { Reveal.next(); }
+    function navPrev() {
+      if (typeof stopSlideMediaAndDemos === "function") stopSlideMediaAndDemos();
+      Reveal.prev();
+    }
+    function navNext() {
+      if (typeof stopSlideMediaAndDemos === "function") stopSlideMediaAndDemos();
+      Reveal.next();
+    }
     function navFrag() {
       if (!Reveal.nextFragment()) Reveal.next();
     }
@@ -1283,6 +1289,7 @@
     let speechEpoch = 0;
     const BN_AUDIO_BASE = "audio/bn/";
     let currentBnAudio = null;
+    const activeBnAudios = new Set();
 
     const MANUAL_CUE_CLIP = {
       "*": "cue-star", "2": "cue-2", "4": "cue-4", "7": "cue-7", "#": "cue-hash",
@@ -1376,15 +1383,36 @@
       }
     }
 
+    function stopAllBnAudio() {
+      activeBnAudios.forEach((a) => {
+        try {
+          a.pause();
+          a.currentTime = 0;
+          a.src = "";
+        } catch (e) { /* ignore */ }
+      });
+      activeBnAudios.clear();
+      if (currentBnAudio) {
+        try {
+          currentBnAudio.pause();
+          currentBnAudio.currentTime = 0;
+          currentBnAudio.src = "";
+        } catch (e) { /* ignore */ }
+        currentBnAudio = null;
+      }
+    }
+
     function flushSpeech() {
       speechEpoch += 1;
       speechTail = Promise.resolve();
-      if (currentBnAudio) {
-        currentBnAudio.pause();
-        currentBnAudio.currentTime = 0;
-        currentBnAudio = null;
+      stopAllBnAudio();
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+        try {
+          window.speechSynthesis.pause();
+          window.speechSynthesis.cancel();
+        } catch (e) { /* ignore */ }
       }
-      if (window.speechSynthesis) window.speechSynthesis.cancel();
       if (ivrBanner) ivrBanner.classList.remove("on");
     }
 
@@ -1400,11 +1428,14 @@
       const epoch = speechEpoch;
       speechTail = speechTail.then(() => new Promise((resolve) => {
         if (epoch !== speechEpoch || !src) {
-          if (fallbackText) speakQueued(fallbackText, { ...opts, clipId: null, _noNeural: true }).then(resolve);
-          else resolve();
+          resolve();
           return;
         }
         const a = new Audio(src);
+        activeBnAudios.add(a);
+        const dropAudio = () => activeBnAudios.delete(a);
+        a.addEventListener("ended", dropAudio, { once: true });
+        a.addEventListener("error", dropAudio, { once: true });
         currentBnAudio = a;
         if (showBanner && ivrBanner) {
           ivrBanner.classList.add("on");
@@ -1416,23 +1447,28 @@
           settled = true;
           currentBnAudio = null;
           if (showBanner && ivrBanner) ivrBanner.classList.remove("on");
-          if (fallback && fallbackText) {
+          if (fallback && fallbackText && epoch === speechEpoch) {
             speakQueued(fallbackText, { ...opts, clipId: null, _noNeural: true }).then(resolve);
           } else {
             setTimeout(resolve, useBn ? 200 : 100);
           }
         };
         a.addEventListener("playing", () => {
+          if (epoch !== speechEpoch) {
+            a.pause();
+            finish(false);
+            return;
+          }
           if (onPlaying) onPlaying();
         }, { once: true });
-        const failSafe = setTimeout(() => finish(true), 12000);
+        const failSafe = setTimeout(() => finish(false), 12000);
         const done = (fb) => {
           clearTimeout(failSafe);
           finish(fb);
         };
         a.onended = () => done(false);
-        a.onerror = () => done(true);
-        a.play().catch(() => done(true));
+        a.onerror = () => done(false);
+        a.play().catch(() => done(false));
       }));
       return speechTail;
     }
@@ -2138,6 +2174,17 @@
       e.stopPropagation();
       stopSlideMediaAndDemos();
       runTrailDemo();
+    });
+
+    Reveal.on("keydown", (e) => {
+      const k = e.keyCode;
+      if (k === 37 || k === 39 || k === 38 || k === 40 || k === 33 || k === 34) {
+        stopSlideMediaAndDemos();
+      }
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) stopSlideMediaAndDemos();
     });
 
     Reveal.on("slidechanged", (ev) => {
