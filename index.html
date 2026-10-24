@@ -1084,8 +1084,6 @@
     <label class="voice-opts">
       <input type="checkbox" id="voice-ivr" checked /> IVR voice
       <input type="checkbox" id="voice-bn" checked /> বাংলা IVR
-      <input type="checkbox" id="voice-news" checked title="Neural Bengali (film-style)" /> 🎬 Neural BN
-      <span id="voice-status" class="voice-status" title="Selected TTS voice"></span>
     </label>
   </div>
 
@@ -1232,7 +1230,6 @@
     const ivrBanner = document.getElementById("ivr-banner");
     const voiceIvrEl = document.getElementById("voice-ivr");
     const voiceBnEl = document.getElementById("voice-bn");
-    const voiceNewsEl = document.getElementById("voice-news");
 
     const IVR_LINES = {
       en: {
@@ -1281,7 +1278,7 @@
     };
 
     function bnNeuralEnabled() {
-      return voiceBnEl && voiceBnEl.checked && voiceNewsEl && voiceNewsEl.checked;
+      return voiceBnEl && voiceBnEl.checked;
     }
 
     function voiceEnabled() {
@@ -1340,15 +1337,7 @@
     }
 
     function updateVoiceStatusLabel() {
-      const el = document.getElementById("voice-status");
-      if (!el || !("speechSynthesis" in window)) return;
-      refreshVoiceCache();
-      const useBn = voiceBnEl && voiceBnEl.checked;
-      const v = useBn ? cachedBnVoice : cachedEnVoice;
-      let label = v ? v.name.slice(0, 24) : useBn ? "BN default" : "EN default";
-      if (useBn && bnNeuralEnabled()) label = "🎬 Nabanita";
-      else if (useBn) label = "BN: " + label;
-      el.textContent = label;
+      /* voice name hidden in UI */
     }
 
     function estimateSpeechMs(text, useBn) {
@@ -1407,7 +1396,7 @@
         currentBnAudio = a;
         if (showBanner && ivrBanner) {
           ivrBanner.classList.add("on");
-          ivrBanner.textContent = "🎬 বাংলা · Nabanita Neural…";
+          ivrBanner.textContent = "🔊 বাংলা IVR…";
         }
         let settled = false;
         const finish = (fallback) => {
@@ -1618,10 +1607,6 @@
       window.speechSynthesis.onvoiceschanged = refreshVoices;
       refreshVoices();
       voiceBnEl?.addEventListener("change", updateVoiceStatusLabel);
-      voiceNewsEl?.addEventListener("change", () => {
-        cachedBnVoice = null;
-        updateVoiceStatusLabel();
-      });
     }
 
     /* ——— Deck toolbar: start, refresh, jump ——— */
@@ -1676,7 +1661,7 @@
           Reveal.slide(i);
         }
       });
-      ["voice-ivr", "voice-bn", "voice-news"].forEach((id) => {
+      ["voice-ivr", "voice-bn"].forEach((id) => {
         document.getElementById(id)?.addEventListener("change", (e) => e.stopPropagation());
       });
     }
