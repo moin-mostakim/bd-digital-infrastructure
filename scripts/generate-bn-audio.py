@@ -38,27 +38,27 @@ CLIPS = {
     "sync-1-4": "সাত।",
     "sync-1-5": "হ্যাশ।",
     "sync-1-6": "সংযোগ হয়ে গেছে। কৃষি বিল চালু আছে।",
-    "sync-2-0": "ধান বেছে নিন, চাপুন",
-    "sync-2-1": "এক।",
-    "sync-3-0": "পরিমাণ লিখুন।",
-    "sync-3-1": "পাঁচ।",
-    "sync-3-2": "শূন্য। এবার নিশ্চিত করুন,",
-    "sync-3-3": "হ্যাশ।",
-    "sync-4-0": "প্রতি কেজির দাম।",
-    "sync-4-1": "চার।",
-    "sync-4-2": "দুই। নিশ্চিত করতে,",
-    "sync-4-3": "হ্যাশ।",
+    "sync-2-0": "ধান নির্বাচনে এক চাপুন।",
+    "sync-3-0": "পরিমাণ পঞ্চাশ কেজি।",
+    "sync-3-1": "নিশ্চিত করতে, হ্যাশ।",
+    "sync-4-0": "প্রতি কেজি বিয়ালিশ টাকা।",
+    "sync-4-1": "নিশ্চিত, হ্যাশ।",
     "sync-5-0": "ক্রেতার মোবাইল নম্বর লিখুন।",
     "sync-5-2": "নম্বর ঠিক আছে, হ্যাশ।",
     "sync-6-0": "চালান পাঠাতে চাপুন",
     "sync-6-1": "হ্যাশ।",
 }
 
+# Always rewrite these (script/dialogue changes)
+FORCE = {
+    "sync-2-0", "sync-3-0", "sync-3-1", "sync-4-0", "sync-4-1",
+}
+
 
 async def one(name: str, text: str) -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     mp3 = OUT / f"{name}.mp3"
-    if mp3.exists() and mp3.stat().st_size > 500:
+    if mp3.exists() and mp3.stat().st_size > 500 and name not in FORCE:
         return
     communicate = __import__("edge_tts").Communicate(text, VOICE, rate=RATE, pitch=PITCH)
     await communicate.save(str(mp3))

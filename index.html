@@ -1424,9 +1424,14 @@
         a.addEventListener("playing", () => {
           if (onPlaying) onPlaying();
         }, { once: true });
-        a.onended = () => finish(false);
-        a.onerror = () => finish(true);
-        a.play().catch(() => finish(true));
+        const failSafe = setTimeout(() => finish(true), 12000);
+        const done = (fb) => {
+          clearTimeout(failSafe);
+          finish(fb);
+        };
+        a.onended = () => done(false);
+        a.onerror = () => done(true);
+        a.play().catch(() => done(true));
       }));
       return speechTail;
     }
@@ -1484,18 +1489,17 @@
       const keyList = keys || [];
       const rapid = seg && seg.rapid;
       const trimmed = (text || "").trim();
-      const clipId = useBn && bnNeuralEnabled() ? `sync-${step}-${segIndex}` : null;
+      const clipId = useBn && bnNeuralEnabled() && trimmed && !rapid ? `sync-${step}-${segIndex}` : null;
+      const keysAfterSpeech = seg && seg.keysAfterSpeech;
 
       if (!voiceEnabled()) {
-        return (trimmed ? speakQueued(trimmed, { banner: true, clipId }) : Promise.resolve()).then(() =>
-          keyList.length ? pressKeysSynced(keyList, step, { rapid: rapid || !trimmed }) : undefined
-        );
+        return (trimmed ? speakQueued(trimmed, { banner: true, clipId }) : Promise.resolve()).then(async () => {
+          if (keyList.length) await pressKeysSynced(keyList, step, { rapid: rapid || !trimmed });
+        });
       }
 
       if (rapid || (keyList.length && !trimmed)) {
-        return speakQueued(trimmed || " ", { banner: true, clipId }).then(() =>
-          pressKeysSynced(keyList, step, { rapid: true })
-        );
+        return pressKeysSynced(keyList, step, { rapid: true });
       }
 
       if (!keyList.length) return speakQueued(trimmed, { banner: true, clipId });
@@ -1514,10 +1518,15 @@
             await sleep(gap);
           }
         };
+        if (keysAfterSpeech) {
+          return queueBnClip(clipId, trimmed, { banner: true }).then(async () => {
+            await runKeys();
+          });
+        }
         return queueBnClip(clipId, trimmed, { banner: true }, () => {
           setTimeout(runKeys, 120);
-        }).then(() => {
-          if (!keysStarted) return runKeys();
+        }).then(async () => {
+          if (!keysStarted) await runKeys();
         });
       }
 
@@ -1556,12 +1565,11 @@
           }
         };
         u.onstart = () => {
-          setTimeout(runKeys, keyPressLead);
+          if (!keysAfterSpeech) setTimeout(runKeys, keyPressLead);
         };
         u.onend = u.onerror = () => {
           clearTimeout(failSafe);
-          if (!keysStarted) runKeys();
-          finish();
+          Promise.resolve(keysAfterSpeech || !keysStarted ? runKeys() : null).then(() => finish());
         };
         if (window.speechSynthesis.paused) window.speechSynthesis.resume();
         window.speechSynthesis.speak(u);
@@ -1680,8 +1688,8 @@
     const DEMO_SEQUENCE = [
       { keys: ["*", "2", "4", "7", "#"], step: 1, screen: ["Connecting USSD...", "KrishiBill", "Session: KB-001"] },
       { keys: ["1"], step: 2, screen: ["1. <span class='bn'>ধান</span> (Paddy)", "2. Mustard", "3. Veg", "Select:"] },
-      { keys: ["5", "0", "#"], step: 3, screen: ["Qty (kg):", "50", "OK? 1=Yes"] },
-      { keys: ["4", "2", "#"], step: 4, screen: ["Price/kg:", "42 BDT", "Total: 2100"] },
+      { keys: ["#"], step: 3, screen: ["Qty (kg):", "50", "OK? 1=Yes"] },
+      { keys: ["#"], step: 4, screen: ["Price/kg:", "42 BDT", "Total: 2100"] },
       { keys: ["0", "1", "7", "1", "2", "3", "4", "5", "6", "7", "8", "#"], step: 5, screen: ["Buyer mobile:", "01712345678", "Send? #=Yes"] },
       { keys: ["#"], step: 6, screen: ["<span class='bn'>পাঠানো হয়েছে!</span>", "Sent!", "SMS OK", "Receipt KB-8842"] },
     ];
@@ -1699,20 +1707,25 @@
           { text: "U S S D connected. Krishi Bill session started.", keys: [] },
         ],
         2: [
-          { text: "Select paddy. Press ", keys: [] },
-          { text: "one.", keys: ["1"] },
+          { text: "Press one for paddy.", keys: ["1"], keysAfterSpeech: true },
         ],
         3: [
-          { text: "Quantity: ", keys: [] },
-          { text: "five, ", keys: ["5"] },
-          { text: "zero. Confirm ", keys: ["0"] },
-          { text: "hash.", keys: ["#"] },
+          {
+            text: "Quantity fifty kilograms.",
+            keys: [],
+            fillValue: "50",
+            fillScreen: ["Qty (kg):", "50", "OK? 1=Yes"],
+          },
+          { text: "Confirm with hash.", keys: ["#"], keysAfterSpeech: true },
         ],
         4: [
-          { text: "Price per kilo: ", keys: [] },
-          { text: "four, ", keys: ["4"] },
-          { text: "two. Confirm ", keys: ["2"] },
-          { text: "hash.", keys: ["#"] },
+          {
+            text: "Price forty two taka per kilo.",
+            keys: [],
+            fillValue: "42",
+            fillScreen: ["Price/kg:", "42 BDT", "Total: 2100"],
+          },
+          { text: "Confirm with hash.", keys: ["#"], keysAfterSpeech: true },
         ],
         5: [
           { text: "Enter buyer mobile number. ", keys: [] },
@@ -1735,20 +1748,25 @@
           { text: "সংযোগ হয়ে গেছে। কৃষি বিল চালু আছে।", keys: [] },
         ],
         2: [
-          { text: "ধান বেছে নিন, চাপুন", keys: [] },
-          { text: "এক।", keys: ["1"] },
+          { text: "ধান নির্বাচনে এক চাপুন।", keys: ["1"], keysAfterSpeech: true },
         ],
         3: [
-          { text: "পরিমাণ লিখুন।", keys: [] },
-          { text: "পাঁচ।", keys: ["5"] },
-          { text: "শূন্য। এবার নিশ্চিত করুন,", keys: ["0"] },
-          { text: "হ্যাশ।", keys: ["#"] },
+          {
+            text: "পরিমাণ পঞ্চাশ কেজি।",
+            keys: [],
+            fillValue: "50",
+            fillScreen: ["Qty (kg):", "50", "OK? 1=Yes"],
+          },
+          { text: "নিশ্চিত করতে, হ্যাশ।", keys: ["#"], keysAfterSpeech: true },
         ],
         4: [
-          { text: "প্রতি কেজির দাম।", keys: [] },
-          { text: "চার।", keys: ["4"] },
-          { text: "দুই। নিশ্চিত করতে,", keys: ["2"] },
-          { text: "হ্যাশ।", keys: ["#"] },
+          {
+            text: "প্রতি কেজি বিয়ালিশ টাকা।",
+            keys: [],
+            fillValue: "42",
+            fillScreen: ["Price/kg:", "42 BDT", "Total: 2100"],
+          },
+          { text: "নিশ্চিত, হ্যাশ।", keys: ["#"], keysAfterSpeech: true },
         ],
         5: [
           { text: "ক্রেতার মোবাইল নম্বর লিখুন।", keys: [] },
@@ -1854,6 +1872,9 @@
       const lang = useBn ? "bn" : "en";
       const cue = MANUAL_KEY_CUE[lang][key];
       if (!cue) return;
+      if (manualStep === 2 || manualStep === 3) {
+        if (key !== "#") return;
+      }
       if (manualStep === 0 || manualStep === 1 || manualStep === 2 || manualStep === 3 || manualStep === 4) {
         const clipId = useBn && bnNeuralEnabled() ? MANUAL_CUE_CLIP[key] : null;
         speakQueued(cue + ", ", { banner: false, clipId });
@@ -1869,6 +1890,8 @@
       setRailStep(block.step, { silent: true });
       keyBuffer = "";
 
+      if (block.step === 2) setScreen(block.screen);
+
       if (!script) {
         for (const k of block.keys) {
           pressKeyVisual(k);
@@ -1883,6 +1906,12 @@
 
       for (let si = 0; si < script.length; si++) {
         const seg = script[si];
+        if (seg.fillValue) {
+          keyBuffer = seg.fillValue;
+          if (seg.fillScreen) setScreen(seg.fillScreen);
+          else updateDialLcd(block.step, keyBuffer);
+        }
+        if (block.step === 2 && si === 0) await sleep(280);
         await speakQueuedWithKeys(seg.text, seg.keys || [], block.step, seg, si);
       }
 
@@ -1934,23 +1963,31 @@
         return;
       }
       if (manualStep === 2) {
-        keyBuffer += key;
         if (key === "#") {
           manualStep = 3;
           setRailStep(3);
           keyBuffer = "";
           setScreen(DEMO_SEQUENCE[2].screen);
-        } else setScreen(["Qty:", keyBuffer.replace("#", "")]);
+        } else {
+          keyBuffer += key;
+          if (keyBuffer === "50" || keyBuffer.endsWith("50")) {
+            setScreen(["Qty (kg):", "50", "OK? #=Yes"]);
+          } else setScreen(["Qty:", keyBuffer, "# to confirm"]);
+        }
         return;
       }
       if (manualStep === 3) {
-        keyBuffer += key;
         if (key === "#") {
           manualStep = 4;
           setRailStep(4);
           keyBuffer = "";
           setScreen(DEMO_SEQUENCE[3].screen);
-        } else setScreen(["Price/kg:", keyBuffer.replace("#", "")]);
+        } else {
+          keyBuffer += key;
+          if (keyBuffer === "42" || keyBuffer.endsWith("42")) {
+            setScreen(["Price/kg:", "42 BDT", "Total: 2100", "#=Yes"]);
+          } else setScreen(["Price/kg:", keyBuffer, "# to confirm"]);
+        }
         return;
       }
       if (manualStep === 4) {
