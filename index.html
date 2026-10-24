@@ -1499,7 +1499,9 @@
       }
 
       if (rapid || (keyList.length && !trimmed)) {
-        return pressKeysSynced(keyList, step, { rapid: true });
+        const run = () => pressKeysSynced(keyList, step, { rapid: true });
+        speechTail = speechTail.then(run);
+        return speechTail;
       }
 
       if (!keyList.length) return speakQueued(trimmed, { banner: true, clipId });
@@ -1690,7 +1692,7 @@
       { keys: ["1"], step: 2, screen: ["1. <span class='bn'>ধান</span> (Paddy)", "2. Mustard", "3. Veg", "Select:"] },
       { keys: ["#"], step: 3, screen: ["Qty (kg):", "50", "OK? 1=Yes"] },
       { keys: ["#"], step: 4, screen: ["Price/kg:", "42 BDT", "Total: 2100"] },
-      { keys: ["0", "1", "7", "1", "2", "3", "4", "5", "6", "7", "8", "#"], step: 5, screen: ["Buyer mobile:", "01712345678", "Send? #=Yes"] },
+      { keys: ["#"], step: 5, screen: ["Buyer mobile:", "01712345678", "Send? #=Yes"] },
       { keys: ["#"], step: 6, screen: ["<span class='bn'>পাঠানো হয়েছে!</span>", "Sent!", "SMS OK", "Receipt KB-8842"] },
     ];
 
@@ -1728,9 +1730,14 @@
           { text: "Confirm with hash.", keys: ["#"], keysAfterSpeech: true },
         ],
         5: [
-          { text: "Enter buyer mobile number. ", keys: [] },
-          { text: "", keys: ["0", "1", "7", "1", "2", "3", "4", "5", "6", "7", "8"], rapid: true },
-          { text: "Confirm number. Hash. ", keys: ["#"] },
+          { text: "Enter buyer mobile number.", keys: [] },
+          {
+            text: "Number entered. Confirm with hash.",
+            keys: ["#"],
+            fillValue: "01712345678",
+            fillScreen: ["Buyer mobile:", "01712345678", "Send? #=Yes"],
+            keysAfterSpeech: true,
+          },
         ],
         6: [
           { text: "Send invoice. Press ", keys: [] },
@@ -1770,8 +1777,13 @@
         ],
         5: [
           { text: "ক্রেতার মোবাইল নম্বর লিখুন।", keys: [] },
-          { text: "", keys: ["0", "1", "7", "1", "2", "3", "4", "5", "6", "7", "8"], rapid: true },
-          { text: "নম্বর ঠিক আছে, হ্যাশ।", keys: ["#"] },
+          {
+            text: "নম্বর লেখা হয়েছে। নিশ্চিত করতে, হ্যাশ।",
+            keys: ["#"],
+            fillValue: "01712345678",
+            fillScreen: ["Buyer mobile:", "01712345678", "Send? #=Yes"],
+            keysAfterSpeech: true,
+          },
         ],
         6: [
           { text: "চালান পাঠাতে চাপুন", keys: [] },
