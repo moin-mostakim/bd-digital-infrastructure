@@ -1416,6 +1416,83 @@
       return speechTail;
     }
 
+    function speakQueuedWithKeys(text, keys, step, seg) {
+      const useBn = voiceBnEl && voiceBnEl.checked;
+      const keyList = keys || [];
+      const rapid = seg && seg.rapid;
+      const trimmed = (text || "").trim();
+
+      if (!voiceEnabled()) {
+        return (trimmed ? speakQueued(trimmed, { banner: true }) : Promise.resolve()).then(() =>
+          keyList.length ? pressKeysSynced(keyList, step, { rapid: rapid || !trimmed }) : undefined
+        );
+      }
+
+      if (rapid || (keyList.length && !trimmed)) {
+        return speakQueued(trimmed || " ", { banner: true }).then(() =>
+          pressKeysSynced(keyList, step, { rapid: true })
+        );
+      }
+
+      if (!keyList.length) return speakQueued(trimmed, { banner: true });
+
+      const showBanner = true;
+      const epoch = speechEpoch;
+      const keyPressLead = useBn ? 130 : 90;
+      speechTail = speechTail.then(() => new Promise((resolve) => {
+        if (epoch !== speechEpoch) return resolve();
+        const u = new SpeechSynthesisUtterance(trimmed);
+        applySpeechSettings(u, useBn);
+        if (showBanner && ivrBanner) {
+          ivrBanner.classList.add("on");
+          ivrBanner.textContent = useBn ? "🔊 বাংলা IVR…" : "🔊 IVR (English)…";
+        }
+        let resumeTimer = null;
+        let settled = false;
+        let keysStarted = false;
+        const finish = () => {
+          if (settled) return;
+          settled = true;
+          if (resumeTimer) clearInterval(resumeTimer);
+          if (ivrBanner) ivrBanner.classList.remove("on");
+          const gap = useBn ? 180 : 100;
+          setTimeout(resolve, gap);
+        };
+        const failSafe = setTimeout(finish, estimateSpeechMs(trimmed, useBn) + 600);
+        const runKeys = async () => {
+          if (keysStarted || epoch !== speechEpoch) return;
+          keysStarted = true;
+          const gap = keyList.length > 1 ? (useBn ? 240 : 200) : (useBn ? 260 : 200);
+          for (const k of keyList) {
+            pressKeyVisual(k);
+            keyBuffer += k;
+            updateDialLcd(step, keyBuffer);
+            await sleep(gap);
+          }
+        };
+        u.onstart = () => {
+          setTimeout(runKeys, keyPressLead);
+        };
+        u.onend = u.onerror = () => {
+          clearTimeout(failSafe);
+          if (!keysStarted) runKeys();
+          finish();
+        };
+        if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+        window.speechSynthesis.speak(u);
+        resumeTimer = setInterval(() => {
+          if (epoch !== speechEpoch) {
+            clearInterval(resumeTimer);
+            return;
+          }
+          if (window.speechSynthesis.speaking && window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+          }
+        }, 280);
+      }));
+      return speechTail;
+    }
+
     function speakIVR(step) {
       const useBn = voiceBnEl && voiceBnEl.checked;
       const lang = useBn ? "bn" : "en";
@@ -1597,6 +1674,17 @@
       },
     };
 
+    const MANUAL_KEY_CUE = {
+      en: {
+        "*": "star", "2": "two", "4": "four", "7": "seven", "#": "hash",
+        "1": "one", "5": "five", "0": "zero",
+      },
+      bn: {
+        "*": "স্টার", "2": "দুই", "4": "চার", "7": "সাত", "#": "হ্যাশ",
+        "1": "এক", "5": "পাঁচ", "0": "শূন্য",
+      },
+    };
+
     let demoIndex = 0;
     let keyBuffer = "";
     let demoRunning = false;
@@ -1672,11 +1760,21 @@
       }
     }
 
+    function speakManualKeyCue(key, manualStep) {
+      if (!voiceEnabled() || demoRunning) return;
+      const useBn = voiceBnEl && voiceBnEl.checked;
+      const lang = useBn ? "bn" : "en";
+      const cue = MANUAL_KEY_CUE[lang][key];
+      if (!cue) return;
+      if (manualStep === 0 || manualStep === 1 || manualStep === 2 || manualStep === 3 || manualStep === 4) {
+        speakQueued(cue + ", ", { banner: false });
+      }
+    }
+
     async function runPhoneBlockSync(block) {
       const useBn = voiceBnEl && voiceBnEl.checked;
       const lang = useBn ? "bn" : "en";
       const script = PHONE_DEMO_SYNC[lang][block.step];
-      const leadMs = voiceEnabled() ? (useBn ? 150 : 110) : 0;
       const tailMs = useBn ? 400 : 320;
 
       setRailStep(block.step, { silent: true });
@@ -1695,18 +1793,7 @@
       }
 
       for (const seg of script) {
-        const keys = seg.keys || [];
-        const hasText = seg.text && seg.text.trim().length > 0;
-        let speechDone = Promise.resolve();
-        if (hasText) {
-          speechDone = speakQueued(seg.text, { banner: true });
-          if (keys.length && !seg.rapid) await sleep(leadMs);
-        }
-        if (keys.length) {
-          await pressKeysSynced(keys, block.step, { rapid: seg.rapid || !hasText });
-        }
-        if (hasText) await speechDone;
-        else if (!keys.length) await sleep(80);
+        await speakQueuedWithKeys(seg.text, seg.keys || [], block.step, seg);
       }
 
       setScreen(block.screen);
@@ -1737,6 +1824,7 @@
       if (demoRunning) return;
       pressKeyVisual(key);
       flashLcd();
+      speakManualKeyCue(key, manualStep);
 
       if (manualStep === 0) {
         keyBuffer += key;
