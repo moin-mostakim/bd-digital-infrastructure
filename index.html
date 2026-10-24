@@ -205,6 +205,18 @@
       position: relative; display: flex; align-items: center; justify-content: center;
       overflow: hidden; min-height: 150px;
     }
+    #slide-trail-proto .proto-window {
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+    }
+    #slide-trail-proto .proto-cam .dummy-face,
+    #slide-trail-proto .proto-cam .face-frame,
+    #slide-trail-proto .proto-cam .cam-status,
+    #slide-trail-proto .proto-cam .cam-corner {
+      opacity: 1;
+      visibility: visible;
+    }
     .dummy-face {
       width: 72px; height: 88px; position: relative; z-index: 1;
       transition: filter 0.4s ease, transform 0.4s ease;
@@ -984,7 +996,7 @@
         <span class="act-tag proto">Scenario II · Prototype</span>
         <h2>TrailGuard console (mock)—Anwar’s case AH-4471</h2>
         <div class="cols">
-          <div class="proto-window fragment fade-up" id="trail-console">
+          <div class="proto-window" id="trail-console">
             <div class="proto-titlebar">
               <span class="proto-dot" style="background:#f55"></span>
               <span class="proto-dot" style="background:#fb0"></span>
@@ -2084,13 +2096,29 @@
         resetPhone();
         setTimeout(() => runDemo(), 800);
       } else if (id === "slide-trail-proto") {
-        setTimeout(runTrailDemo, 500);
+        resetTrailDemo();
+        requestAnimationFrame(() => {
+          void document.getElementById("proto-cam")?.offsetHeight;
+        });
+        setTimeout(runTrailDemo, 180);
       } else {
         resetTrailDemo();
       }
     });
 
     resetPhone();
+
+    function preloadTrailConsoleAssets() {
+      const cam = document.getElementById("proto-cam");
+      if (cam) void cam.offsetHeight;
+      if (bnNeuralEnabled()) {
+        ["trail-0", "trail-1", "trail-2"].forEach((id) => {
+          const a = new Audio(bnClipUrl(id));
+          a.preload = "auto";
+        });
+      }
+    }
+    Reveal.on("ready", preloadTrailConsoleAssets);
   </script>
 </body>
 </html>
