@@ -1084,7 +1084,7 @@
     <label class="voice-opts">
       <input type="checkbox" id="voice-ivr" checked /> IVR voice
       <input type="checkbox" id="voice-bn" checked /> বাংলা IVR
-      <input type="checkbox" id="voice-news" checked title="News-anchor voice and pacing" /> News tone
+      <input type="checkbox" id="voice-news" checked title="Neural Bengali (film-style)" /> 🎬 Neural BN
       <span id="voice-status" class="voice-status" title="Selected TTS voice"></span>
     </label>
   </div>
@@ -1245,13 +1245,13 @@
         6: "Transaction complete. Thank you.",
       },
       bn: {
-        0: "কৃষি বিল-এ স্বাগতম।",
-        1: "ইউ, এস, এস, ডি, সংযোগ সফল। কৃষি বিল সেশন চালু হয়েছে।",
-        2: "ধান নির্বাচন হয়েছে। পরিমাণ, পঞ্চাশ কেজি, লিখুন।",
-        3: "দাম, প্রতি কেজি বিয়ালিশ টাকা। মোট, দুই হাজার একশো টাকা।",
-        4: "ক্রেতার মোবাইল নম্বর দিন। নিশ্চিত করতে, হ্যাশ চাপুন।",
-        5: "চালান পাঠানো হয়েছে। রসিদ, কেবি, আট, আট, চার, দুই। ক্রেতা রহিম-এর ফোনে এসএমএস গেছে।",
-        6: "লেনদেন সম্পন্ন। কৃষি বিল ব্যবহারের জন্য ধন্যবাদ।",
+        0: "কৃষি বিলে আপনাকে স্বাগতম। আমি আপনার সহকারী।",
+        1: "সংযোগ হয়ে গেছে। কৃষি বিল চালু আছে।",
+        2: "ধান নির্বাচন হয়েছে। এখন পরিমাণ লিখুন।",
+        3: "দাম ঠিক হয়েছে। মোট দুই হাজার একশো টাকা।",
+        4: "ক্রেতার নম্বর দিন। শেষে হ্যাশ চাপুন।",
+        5: "চালান পাঠানো হয়েছে। রসিদ নম্বর কেবি আট আট চার দুই। রহিমের ফোনে মেসেজ চলে গেছে।",
+        6: "লেনদেন শেষ। আজকের মতো ধন্যবাদ, আবার আসবেন।",
       },
     };
 
@@ -1262,9 +1262,9 @@
         "Match found. Anwar Hossain. Ninety four percent confidence.",
       ],
       bn: [
-        "গেট নম্বর তিন। মুখমণ্ডল শনাক্ত করা হচ্ছে।",
-        "ডিজিটাল স্বাক্ষর তৈরি হয়েছে। জাতীয় তালিকায় অনুসন্ধান চলছে।",
-        "মিল পাওয়া গেছে। আনোয়ার হোসেন। নির্ভুলতা, ninety-four শতাংশ।",
+        "গেট তিনে ক্যামেরা মুখ খুঁজছে।",
+        "ছবি থেকে স্বাক্ষর তৈরি হয়েছে। জাতীয় তালিকায় খোঁজ চলছে।",
+        "মিল পেয়েছি। আনোয়ার হোসেন। নির্ভুলতা ninety-four শতাংশ।",
       ],
     };
 
@@ -1272,6 +1272,17 @@
     let cachedEnVoice = null;
     let speechTail = Promise.resolve();
     let speechEpoch = 0;
+    const BN_AUDIO_BASE = "audio/bn/";
+    let currentBnAudio = null;
+
+    const MANUAL_CUE_CLIP = {
+      "*": "cue-star", "2": "cue-2", "4": "cue-4", "7": "cue-7", "#": "cue-hash",
+      "1": "cue-1", "5": "cue-5", "0": "cue-0",
+    };
+
+    function bnNeuralEnabled() {
+      return voiceBnEl && voiceBnEl.checked && voiceNewsEl && voiceNewsEl.checked;
+    }
 
     function voiceEnabled() {
       return voiceIvrEl && voiceIvrEl.checked && "speechSynthesis" in window;
@@ -1282,7 +1293,7 @@
     }
 
     function banglaNewsTone() {
-      return voiceBnEl && voiceBnEl.checked && voiceNewsEl && voiceNewsEl.checked;
+      return bnNeuralEnabled();
     }
 
     function pickBanglaVoice() {
@@ -1335,7 +1346,8 @@
       const useBn = voiceBnEl && voiceBnEl.checked;
       const v = useBn ? cachedBnVoice : cachedEnVoice;
       let label = v ? v.name.slice(0, 24) : useBn ? "BN default" : "EN default";
-      if (useBn && banglaNewsTone()) label = "📰 " + label;
+      if (useBn && bnNeuralEnabled()) label = "🎬 Nabanita";
+      else if (useBn) label = "BN: " + label;
       el.textContent = label;
     }
 
@@ -1351,8 +1363,8 @@
       if (useBn) {
         const news = banglaNewsTone();
         utterance.lang = "bn-BD";
-        utterance.rate = news ? 0.9 : 0.86;
-        utterance.pitch = news ? 1.02 : 0.98;
+        utterance.rate = 0.82;
+        utterance.pitch = 1;
         utterance.volume = 1;
         if (cachedBnVoice) utterance.voice = cachedBnVoice;
       } else {
@@ -1366,14 +1378,67 @@
     function flushSpeech() {
       speechEpoch += 1;
       speechTail = Promise.resolve();
+      if (currentBnAudio) {
+        currentBnAudio.pause();
+        currentBnAudio.currentTime = 0;
+        currentBnAudio = null;
+      }
       if (window.speechSynthesis) window.speechSynthesis.cancel();
       if (ivrBanner) ivrBanner.classList.remove("on");
     }
 
+    function bnClipUrl(clipId) {
+      if (!clipId) return null;
+      return BN_AUDIO_BASE + clipId + ".mp3";
+    }
+
+    function queueBnClip(clipId, fallbackText, opts, onPlaying) {
+      const showBanner = !opts || opts.banner !== false;
+      const useBn = true;
+      const src = bnClipUrl(clipId);
+      const epoch = speechEpoch;
+      speechTail = speechTail.then(() => new Promise((resolve) => {
+        if (epoch !== speechEpoch || !src) {
+          if (fallbackText) speakQueued(fallbackText, { ...opts, clipId: null, _noNeural: true }).then(resolve);
+          else resolve();
+          return;
+        }
+        const a = new Audio(src);
+        currentBnAudio = a;
+        if (showBanner && ivrBanner) {
+          ivrBanner.classList.add("on");
+          ivrBanner.textContent = "🎬 বাংলা · Nabanita Neural…";
+        }
+        let settled = false;
+        const finish = (fallback) => {
+          if (settled) return;
+          settled = true;
+          currentBnAudio = null;
+          if (showBanner && ivrBanner) ivrBanner.classList.remove("on");
+          if (fallback && fallbackText) {
+            speakQueued(fallbackText, { ...opts, clipId: null, _noNeural: true }).then(resolve);
+          } else {
+            setTimeout(resolve, useBn ? 200 : 100);
+          }
+        };
+        a.addEventListener("playing", () => {
+          if (onPlaying) onPlaying();
+        }, { once: true });
+        a.onended = () => finish(false);
+        a.onerror = () => finish(true);
+        a.play().catch(() => finish(true));
+      }));
+      return speechTail;
+    }
+
     function speakQueued(text, opts) {
+      opts = opts || {};
       if (!voiceEnabled() || !text) return Promise.resolve();
       const useBn = voiceBnEl && voiceBnEl.checked;
-      const showBanner = !opts || opts.banner !== false;
+      if (useBn && bnNeuralEnabled() && opts.clipId && !opts._noNeural) {
+        return queueBnClip(opts.clipId, text, opts);
+      }
+      const showBanner = opts.banner !== false;
       const epoch = speechEpoch;
       speechTail = speechTail.then(() => new Promise((resolve) => {
         if (epoch !== speechEpoch) return resolve();
@@ -1382,9 +1447,7 @@
         if (showBanner && ivrBanner) {
           ivrBanner.classList.add("on");
           const news = useBn && banglaNewsTone();
-          ivrBanner.textContent = useBn
-            ? (news ? "🔊 বাংলা · সংবাদসদন স্বর…" : "🔊 বাংলা IVR…")
-            : "🔊 IVR (English)…";
+          ivrBanner.textContent = useBn ? "🔊 বাংলা IVR (fallback)…" : "🔊 IVR (English)…";
         }
         let resumeTimer = null;
         let settled = false;
@@ -1416,25 +1479,47 @@
       return speechTail;
     }
 
-    function speakQueuedWithKeys(text, keys, step, seg) {
+    function speakQueuedWithKeys(text, keys, step, seg, segIndex) {
       const useBn = voiceBnEl && voiceBnEl.checked;
       const keyList = keys || [];
       const rapid = seg && seg.rapid;
       const trimmed = (text || "").trim();
+      const clipId = useBn && bnNeuralEnabled() ? `sync-${step}-${segIndex}` : null;
 
       if (!voiceEnabled()) {
-        return (trimmed ? speakQueued(trimmed, { banner: true }) : Promise.resolve()).then(() =>
+        return (trimmed ? speakQueued(trimmed, { banner: true, clipId }) : Promise.resolve()).then(() =>
           keyList.length ? pressKeysSynced(keyList, step, { rapid: rapid || !trimmed }) : undefined
         );
       }
 
       if (rapid || (keyList.length && !trimmed)) {
-        return speakQueued(trimmed || " ", { banner: true }).then(() =>
+        return speakQueued(trimmed || " ", { banner: true, clipId }).then(() =>
           pressKeysSynced(keyList, step, { rapid: true })
         );
       }
 
-      if (!keyList.length) return speakQueued(trimmed, { banner: true });
+      if (!keyList.length) return speakQueued(trimmed, { banner: true, clipId });
+
+      if (useBn && bnNeuralEnabled() && clipId) {
+        const epoch = speechEpoch;
+        let keysStarted = false;
+        const runKeys = async () => {
+          if (keysStarted || epoch !== speechEpoch) return;
+          keysStarted = true;
+          const gap = keyList.length > 1 ? 240 : 260;
+          for (const k of keyList) {
+            pressKeyVisual(k);
+            keyBuffer += k;
+            updateDialLcd(step, keyBuffer);
+            await sleep(gap);
+          }
+        };
+        return queueBnClip(clipId, trimmed, { banner: true }, () => {
+          setTimeout(runKeys, 120);
+        }).then(() => {
+          if (!keysStarted) return runKeys();
+        });
+      }
 
       const showBanner = true;
       const epoch = speechEpoch;
@@ -1497,17 +1582,20 @@
       const useBn = voiceBnEl && voiceBnEl.checked;
       const lang = useBn ? "bn" : "en";
       const text = (IVR_LINES[lang] && IVR_LINES[lang][step]) || IVR_LINES.en[step];
-      return speakQueued(text, { banner: true });
+      const clipId = useBn && bnNeuralEnabled() ? "ivr-" + step : null;
+      return speakQueued(text, { banner: true, clipId });
     }
 
     function speakTrail(indexOrText) {
       const useBn = voiceBnEl && voiceBnEl.checked;
       let text = indexOrText;
+      let clipId = null;
       if (typeof indexOrText === "number") {
         const lines = useBn ? TRAIL_LINES.bn : TRAIL_LINES.en;
         text = lines[indexOrText] || TRAIL_LINES.en[indexOrText];
+        if (useBn && bnNeuralEnabled()) clipId = "trail-" + indexOrText;
       }
-      return speakQueued(text, { banner: true });
+      return speakQueued(text, { banner: true, clipId });
     }
 
     if ("speechSynthesis" in window) {
@@ -1638,38 +1726,38 @@
       },
       bn: {
         1: [
-          { text: "ডায়াল করুন, ", keys: [] },
-          { text: "স্টার, ", keys: ["*"] },
-          { text: "দুই, ", keys: ["2"] },
-          { text: "চার, ", keys: ["4"] },
-          { text: "সাত, ", keys: ["7"] },
-          { text: "হ্যাশ। ", keys: ["#"] },
-          { text: "ইউ, এস, এস, ডি, সংযোগ সফল। সেশন চালু হয়েছে।", keys: [] },
+          { text: "এখন ডায়াল করুন।", keys: [] },
+          { text: "স্টার।", keys: ["*"] },
+          { text: "দুই।", keys: ["2"] },
+          { text: "চার।", keys: ["4"] },
+          { text: "সাত।", keys: ["7"] },
+          { text: "হ্যাশ।", keys: ["#"] },
+          { text: "সংযোগ হয়ে গেছে। কৃষি বিল চালু আছে।", keys: [] },
         ],
         2: [
-          { text: "ধান নির্বাচন, চাপুন ", keys: [] },
-          { text: "এক। ", keys: ["1"] },
+          { text: "ধান বেছে নিন, চাপুন", keys: [] },
+          { text: "এক।", keys: ["1"] },
         ],
         3: [
-          { text: "পরিমাণ, ", keys: [] },
-          { text: "পাঁচ, ", keys: ["5"] },
-          { text: "শূন্য। নিশ্চিত, ", keys: ["0"] },
-          { text: "হ্যাশ। ", keys: ["#"] },
+          { text: "পরিমাণ লিখুন।", keys: [] },
+          { text: "পাঁচ।", keys: ["5"] },
+          { text: "শূন্য। এবার নিশ্চিত করুন,", keys: ["0"] },
+          { text: "হ্যাশ।", keys: ["#"] },
         ],
         4: [
-          { text: "দাম প্রতি কেজি, ", keys: [] },
-          { text: "চার, ", keys: ["4"] },
-          { text: "দুই। নিশ্চিত, ", keys: ["2"] },
-          { text: "হ্যাশ। ", keys: ["#"] },
+          { text: "প্রতি কেজির দাম।", keys: [] },
+          { text: "চার।", keys: ["4"] },
+          { text: "দুই। নিশ্চিত করতে,", keys: ["2"] },
+          { text: "হ্যাশ।", keys: ["#"] },
         ],
         5: [
-          { text: "ক্রেতার মোবাইল নম্বর লিখুন। ", keys: [] },
+          { text: "ক্রেতার মোবাইল নম্বর লিখুন।", keys: [] },
           { text: "", keys: ["0", "1", "7", "1", "2", "3", "4", "5", "6", "7", "8"], rapid: true },
-          { text: "নম্বর নিশ্চিত, হ্যাশ। ", keys: ["#"] },
+          { text: "নম্বর ঠিক আছে, হ্যাশ।", keys: ["#"] },
         ],
         6: [
-          { text: "চালান পাঠাতে, চাপুন ", keys: [] },
-          { text: "হ্যাশ। ", keys: ["#"] },
+          { text: "চালান পাঠাতে চাপুন", keys: [] },
+          { text: "হ্যাশ।", keys: ["#"] },
         ],
       },
     };
@@ -1767,7 +1855,8 @@
       const cue = MANUAL_KEY_CUE[lang][key];
       if (!cue) return;
       if (manualStep === 0 || manualStep === 1 || manualStep === 2 || manualStep === 3 || manualStep === 4) {
-        speakQueued(cue + ", ", { banner: false });
+        const clipId = useBn && bnNeuralEnabled() ? MANUAL_CUE_CLIP[key] : null;
+        speakQueued(cue + ", ", { banner: false, clipId });
       }
     }
 
@@ -1792,8 +1881,9 @@
         return;
       }
 
-      for (const seg of script) {
-        await speakQueuedWithKeys(seg.text, seg.keys || [], block.step, seg);
+      for (let si = 0; si < script.length; si++) {
+        const seg = script[si];
+        await speakQueuedWithKeys(seg.text, seg.keys || [], block.step, seg, si);
       }
 
       setScreen(block.screen);
