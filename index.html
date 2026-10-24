@@ -1084,6 +1084,7 @@
     <label class="voice-opts">
       <input type="checkbox" id="voice-ivr" checked /> IVR voice
       <input type="checkbox" id="voice-bn" checked /> বাংলা IVR
+      <input type="checkbox" id="voice-news" checked title="News-anchor voice and pacing" /> News tone
       <span id="voice-status" class="voice-status" title="Selected TTS voice"></span>
     </label>
   </div>
@@ -1231,6 +1232,7 @@
     const ivrBanner = document.getElementById("ivr-banner");
     const voiceIvrEl = document.getElementById("voice-ivr");
     const voiceBnEl = document.getElementById("voice-bn");
+    const voiceNewsEl = document.getElementById("voice-news");
 
     const IVR_LINES = {
       en: {
@@ -1243,13 +1245,13 @@
         6: "Transaction complete. Thank you.",
       },
       bn: {
-        0: "কৃষি বিল-এ আপনাকে স্বাগতম। শুরু করতে, স্টার, দুই, চার, সাত, হ্যাশ—এভাবে চাপুন।",
-        1: "ইউ, এস, এস, ডি, সংযোগ সফল হয়েছে। কৃষি বিল সেশন চালু আছে।",
-        2: "আপনি ধান নির্বাচন করেছেন। পরিমাণ লিখুন—পঞ্চাশ কেজি।",
-        3: "প্রতি কেজির দাম বিয়ালিশ টাকা। মোট দুই হাজার একশো টাকা।",
-        4: "ক্রেতার মোবাইল নম্বর দিন। শেষে নিশ্চিত করতে হ্যাশ চাপুন।",
-        5: "চালান পাঠানো হয়েছে। রসিদ নম্বর, কেবি, আট, আট, চার, দুই। ক্রেতা রহিম-এর ফোনে এসএমএস গেছে।",
-        6: "লেনদেন সম্পন্ন হয়েছে। কৃষি বিল ব্যবহার করার জন্য ধন্যবাদ।",
+        0: "কৃষি বিল-এ স্বাগতম। শুরু করতে চাপুন, স্টার, দুই, চার, সাত, হ্যাশ।",
+        1: "ইউ, এস, এস, ডি, সংযোগ সফল। কৃষি বিল সেশন চালু হয়েছে।",
+        2: "ধান নির্বাচন হয়েছে। পরিমাণ, পঞ্চাশ কেজি, লিখুন।",
+        3: "দাম, প্রতি কেজি বিয়ালিশ টাকা। মোট, দুই হাজার একশো টাকা।",
+        4: "ক্রেতার মোবাইল নম্বর দিন। নিশ্চিত করতে, হ্যাশ চাপুন।",
+        5: "চালান পাঠানো হয়েছে। রসিদ, কেবি, আট, আট, চার, দুই। ক্রেতা রহিম-এর ফোনে এসএমএস গেছে।",
+        6: "লেনদেন সম্পন্ন। কৃষি বিল ব্যবহারের জন্য ধন্যবাদ।",
       },
     };
 
@@ -1260,11 +1262,16 @@
         "Match found. Anwar Hossain. Ninety four percent confidence.",
       ],
       bn: [
-        "গেট তিন-এ মুখ শনাক্ত করা হচ্ছে।",
-        "মুখের embedding তৈরি করে জাতীয় তালিকায় খোঁজা হচ্ছে।",
-        "মিল পাওয়া গেছে। আনোয়ার হোসেন। নির্ভুলতা ninety-four শতাংশ।",
+        "গেট নম্বর তিন। মুখমণ্ডল শনাক্ত করা হচ্ছে।",
+        "ডিজিটাল স্বাক্ষর তৈরি হয়েছে। জাতীয় তালিকায় অনুসন্ধান চলছে।",
+        "মিল পাওয়া গেছে। আনোয়ার হোসেন। নির্ভুলতা, ninety-four শতাংশ।",
       ],
     };
+
+    let cachedBnVoice = null;
+    let cachedEnVoice = null;
+    let speechTail = Promise.resolve();
+    let speechEpoch = 0;
 
     function voiceEnabled() {
       return voiceIvrEl && voiceIvrEl.checked && "speechSynthesis" in window;
@@ -1274,18 +1281,27 @@
       return window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
     }
 
+    function banglaNewsTone() {
+      return voiceBnEl && voiceBnEl.checked && voiceNewsEl && voiceNewsEl.checked;
+    }
+
     function pickBanglaVoice() {
+      if (cachedBnVoice) return cachedBnVoice;
       const voices = getAllVoices();
       const bnVoices = voices.filter((v) => {
         const lang = (v.lang || "").toLowerCase();
         const name = (v.name || "").toLowerCase();
         return lang.startsWith("bn") || name.includes("bangla") || name.includes("bengali") || name.includes("বাংলা");
       });
-      const prefer = [
-        "heera", "lekha", "kalpana", "piya", "google bn", "google বাংলা",
-        "microsoft heera", "microsoft lekha", "bn-bd", "bn-in", "bengali",
-        "bangladesh", "soft", "female",
+      const newsHints = [
+        "news", "presenter", "anchor", "reporter", "narrator", "bulletin",
+        "natural", "neural", "online", "premium", "enhanced", "multilingual",
       ];
+      const classicHints = [
+        "lekha", "heera", "kalpana", "piya", "google bn", "google বাংলা",
+        "microsoft lekha", "microsoft heera", "bn-bd", "bn-in", "bengali", "bangladesh",
+      ];
+      const prefer = banglaNewsTone() ? [...newsHints, ...classicHints] : classicHints;
       for (const hint of prefer) {
         const hit = bnVoices.find((v) => v.name.toLowerCase().includes(hint) || v.lang.toLowerCase().includes(hint));
         if (hit) return hit;
@@ -1294,6 +1310,7 @@
     }
 
     function pickEnglishVoice() {
+      if (cachedEnVoice) return cachedEnVoice;
       const voices = getAllVoices();
       const en = voices.filter((v) => (v.lang || "").toLowerCase().startsWith("en"));
       const prefer = ["samantha", "karen", "daniel", "google us english", "en-in", "en-gb"];
@@ -1304,80 +1321,132 @@
       return en.find((v) => v.lang === "en-IN") || en[0] || null;
     }
 
+    function refreshVoiceCache() {
+      cachedBnVoice = null;
+      cachedEnVoice = null;
+      cachedBnVoice = pickBanglaVoice();
+      cachedEnVoice = pickEnglishVoice();
+    }
+
     function updateVoiceStatusLabel() {
       const el = document.getElementById("voice-status");
       if (!el || !("speechSynthesis" in window)) return;
+      refreshVoiceCache();
       const useBn = voiceBnEl && voiceBnEl.checked;
-      const v = useBn ? pickBanglaVoice() : pickEnglishVoice();
-      if (v) el.textContent = v.name.slice(0, 28);
-      else el.textContent = useBn ? "BN: default" : "EN: default";
+      const v = useBn ? cachedBnVoice : cachedEnVoice;
+      let label = v ? v.name.slice(0, 24) : useBn ? "BN default" : "EN default";
+      if (useBn && banglaNewsTone()) label = "📰 " + label;
+      el.textContent = label;
+    }
+
+    function estimateSpeechMs(text, useBn) {
+      const news = useBn && banglaNewsTone();
+      const rate = useBn ? (news ? 0.9 : 0.86) : 0.92;
+      const charsPerSec = useBn ? 9.5 : 13;
+      return Math.min(14000, Math.max(800, (text.length / charsPerSec) * 1000 / rate));
     }
 
     function applySpeechSettings(utterance, useBn) {
+      refreshVoiceCache();
       if (useBn) {
+        const news = banglaNewsTone();
         utterance.lang = "bn-BD";
-        utterance.rate = 0.82;
-        utterance.pitch = 0.96;
+        utterance.rate = news ? 0.9 : 0.86;
+        utterance.pitch = news ? 1.02 : 0.98;
         utterance.volume = 1;
-        const v = pickBanglaVoice();
-        if (v) utterance.voice = v;
+        if (cachedBnVoice) utterance.voice = cachedBnVoice;
       } else {
         utterance.lang = "en-IN";
         utterance.rate = 0.92;
         utterance.pitch = 1;
-        const v = pickEnglishVoice();
-        if (v) utterance.voice = v;
+        if (cachedEnVoice) utterance.voice = cachedEnVoice;
       }
     }
 
-    let ivrSpeakChain = Promise.resolve();
+    function flushSpeech() {
+      speechEpoch += 1;
+      speechTail = Promise.resolve();
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      if (ivrBanner) ivrBanner.classList.remove("on");
+    }
 
-    function speakIVR(step) {
-      if (!voiceEnabled()) return Promise.resolve();
+    function speakQueued(text, opts) {
+      if (!voiceEnabled() || !text) return Promise.resolve();
       const useBn = voiceBnEl && voiceBnEl.checked;
-      const lang = useBn ? "bn" : "en";
-      let text = (IVR_LINES[lang] && IVR_LINES[lang][step]) || IVR_LINES.en[step];
-      if (!text) return Promise.resolve();
-      ivrSpeakChain = ivrSpeakChain.then(() => new Promise((resolve) => {
-        window.speechSynthesis.cancel();
+      const showBanner = !opts || opts.banner !== false;
+      const epoch = speechEpoch;
+      speechTail = speechTail.then(() => new Promise((resolve) => {
+        if (epoch !== speechEpoch) return resolve();
         const u = new SpeechSynthesisUtterance(text);
         applySpeechSettings(u, useBn);
-        if (ivrBanner) {
+        if (showBanner && ivrBanner) {
           ivrBanner.classList.add("on");
-          ivrBanner.textContent = useBn ? "🔊 বাংলা IVR…" : "🔊 IVR (English)…";
+          const news = useBn && banglaNewsTone();
+          ivrBanner.textContent = useBn
+            ? (news ? "🔊 বাংলা · সংবাদসদন স্বর…" : "🔊 বাংলা IVR…")
+            : "🔊 IVR (English)…";
         }
-        u.onend = u.onerror = () => {
-          if (ivrBanner) ivrBanner.classList.remove("on");
-          resolve();
+        let resumeTimer = null;
+        let settled = false;
+        const finish = () => {
+          if (settled) return;
+          settled = true;
+          if (resumeTimer) clearInterval(resumeTimer);
+          if (showBanner && ivrBanner) ivrBanner.classList.remove("on");
+          const gap = useBn ? 220 : 120;
+          setTimeout(resolve, gap);
         };
+        const failSafe = setTimeout(finish, estimateSpeechMs(text, useBn) + 400);
+        u.onend = u.onerror = () => {
+          clearTimeout(failSafe);
+          finish();
+        };
+        if (window.speechSynthesis.paused) window.speechSynthesis.resume();
         window.speechSynthesis.speak(u);
+        resumeTimer = setInterval(() => {
+          if (epoch !== speechEpoch) {
+            clearInterval(resumeTimer);
+            return;
+          }
+          if (window.speechSynthesis.speaking && window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+          }
+        }, 280);
       }));
-      return ivrSpeakChain;
+      return speechTail;
+    }
+
+    function speakIVR(step) {
+      const useBn = voiceBnEl && voiceBnEl.checked;
+      const lang = useBn ? "bn" : "en";
+      const text = (IVR_LINES[lang] && IVR_LINES[lang][step]) || IVR_LINES.en[step];
+      return speakQueued(text, { banner: true });
     }
 
     function speakTrail(indexOrText) {
-      if (!voiceEnabled()) return;
       const useBn = voiceBnEl && voiceBnEl.checked;
       let text = indexOrText;
       if (typeof indexOrText === "number") {
         const lines = useBn ? TRAIL_LINES.bn : TRAIL_LINES.en;
         text = lines[indexOrText] || TRAIL_LINES.en[indexOrText];
       }
-      if (!text) return;
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      applySpeechSettings(u, useBn);
-      window.speechSynthesis.speak(u);
+      return speakQueued(text, { banner: true });
     }
 
     if ("speechSynthesis" in window) {
       const refreshVoices = () => {
+        cachedBnVoice = null;
+        cachedEnVoice = null;
         window.speechSynthesis.getVoices();
         updateVoiceStatusLabel();
       };
       window.speechSynthesis.onvoiceschanged = refreshVoices;
       refreshVoices();
       voiceBnEl?.addEventListener("change", updateVoiceStatusLabel);
+      voiceNewsEl?.addEventListener("change", () => {
+        cachedBnVoice = null;
+        updateVoiceStatusLabel();
+      });
     }
 
     /* ——— Deck toolbar: start, refresh, jump ——— */
@@ -1404,10 +1473,9 @@
     }
 
     function resetAllDemos() {
+      flushSpeech();
       resetPhone();
       resetTrailDemo();
-      window.speechSynthesis?.cancel();
-      if (ivrBanner) ivrBanner.classList.remove("on");
     }
 
     function initDeckToolbar() {
@@ -1429,11 +1497,11 @@
         e.stopPropagation();
         const i = parseInt(e.target.value, 10);
         if (!Number.isNaN(i)) {
-          window.speechSynthesis?.cancel();
+          flushSpeech();
           Reveal.slide(i);
         }
       });
-      ["voice-ivr", "voice-bn"].forEach((id) => {
+      ["voice-ivr", "voice-bn", "voice-news"].forEach((id) => {
         document.getElementById(id)?.addEventListener("change", (e) => e.stopPropagation());
       });
     }
@@ -1507,22 +1575,27 @@
     async function runDemo() {
       if (demoRunning) return;
       demoRunning = true;
+      flushSpeech();
       resetPhone();
-      await sleep(400);
+      const useBn = voiceBnEl && voiceBnEl.checked;
+      const keyPause = useBn ? 320 : 260;
+      await sleep(350);
+      await speakIVR(0);
       for (const block of DEMO_SEQUENCE) {
-        setRailStep(block.step);
-        await sleep(400);
+        setRailStep(block.step, { silent: true });
+        await speakIVR(block.step);
+        await sleep(useBn ? 200 : 120);
         for (const k of block.keys) {
           pressKeyVisual(k);
           keyBuffer += k;
           if (block.step === 1 && keyBuffer.includes("*247#")) {
             setScreen(["*247#<span class='cursor'>_</span>"]);
-            await sleep(350);
+            await sleep(320);
           }
-          await sleep(280);
+          await sleep(keyPause);
         }
         setScreen(block.screen);
-        await sleep(700);
+        await sleep(useBn ? 480 : 380);
         keyBuffer = "";
       }
       showBuyerSms();
@@ -1630,29 +1703,29 @@
     }
 
     async function runTrailDemo() {
+      flushSpeech();
       resetTrailDemo();
-      await sleep(400);
+      const useBn = voiceBnEl && voiceBnEl.checked;
+      await sleep(350);
       protoCam.classList.add("phase-scan");
       protoStatus.textContent = "Detecting face in frame…";
       setPipe(0);
-      speakTrail(0);
-      await sleep(1200);
+      await speakTrail(0);
       setPipe(1);
       protoStatus.textContent = "Embedding vector → national index…";
-      speakTrail(1);
-      await sleep(1100);
+      await speakTrail(1);
       protoCam.classList.remove("phase-scan");
       protoCam.classList.add("phase-match");
       setPipe(2);
       protoStatus.textContent = "NID record linked · case scoped";
-      speakTrail(2);
+      await speakTrail(2);
       protoMatchLine.style.opacity = "1";
       protoMatchLine.innerHTML = 'Match: <span class="proto-match">Anwar H. · 94.2%</span>';
-      await sleep(800);
+      await sleep(useBn ? 420 : 320);
       setPipe(3);
       protoStatus.textContent = "Graph query: crate AH-4471 + face F";
       for (let i = 0; i < trailNodes.length; i++) {
-        await sleep(550);
+        await sleep(useBn ? 620 : 520);
         trailNodes[i].classList.add("visible");
       }
       protoStatus.textContent = "Done — officer alert queued (audit log #8841)";
