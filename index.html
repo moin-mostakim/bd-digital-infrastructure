@@ -1236,7 +1236,7 @@
 
     const IVR_LINES = {
       en: {
-        0: "Welcome to Krishi Bill. Dial star two four seven hash to begin.",
+        0: "Welcome to Krishi Bill.",
         1: "U S S D connected. Krishi Bill session started.",
         2: "Paddy selected. Enter quantity: fifty kilograms.",
         3: "Price entered: forty two taka per kilogram. Total two thousand one hundred.",
@@ -1245,7 +1245,7 @@
         6: "Transaction complete. Thank you.",
       },
       bn: {
-        0: "কৃষি বিল-এ স্বাগতম। শুরু করতে চাপুন, স্টার, দুই, চার, সাত, হ্যাশ।",
+        0: "কৃষি বিল-এ স্বাগতম।",
         1: "ইউ, এস, এস, ডি, সংযোগ সফল। কৃষি বিল সেশন চালু হয়েছে।",
         2: "ধান নির্বাচন হয়েছে। পরিমাণ, পঞ্চাশ কেজি, লিখুন।",
         3: "দাম, প্রতি কেজি বিয়ালিশ টাকা। মোট, দুই হাজার একশো টাকা।",
@@ -1521,6 +1521,82 @@
       { keys: ["#"], step: 6, screen: ["<span class='bn'>পাঠানো হয়েছে!</span>", "Sent!", "SMS OK", "Receipt KB-8842"] },
     ];
 
+    /** Each segment: speak `text`, then press `keys` in rhythm with the audio. */
+    const PHONE_DEMO_SYNC = {
+      en: {
+        1: [
+          { text: "Dial ", keys: [] },
+          { text: "star, ", keys: ["*"] },
+          { text: "two, ", keys: ["2"] },
+          { text: "four, ", keys: ["4"] },
+          { text: "seven, ", keys: ["7"] },
+          { text: "hash. ", keys: ["#"] },
+          { text: "U S S D connected. Krishi Bill session started.", keys: [] },
+        ],
+        2: [
+          { text: "Select paddy. Press ", keys: [] },
+          { text: "one.", keys: ["1"] },
+        ],
+        3: [
+          { text: "Quantity: ", keys: [] },
+          { text: "five, ", keys: ["5"] },
+          { text: "zero. Confirm ", keys: ["0"] },
+          { text: "hash.", keys: ["#"] },
+        ],
+        4: [
+          { text: "Price per kilo: ", keys: [] },
+          { text: "four, ", keys: ["4"] },
+          { text: "two. Confirm ", keys: ["2"] },
+          { text: "hash.", keys: ["#"] },
+        ],
+        5: [
+          { text: "Enter buyer mobile number. ", keys: [] },
+          { text: "", keys: ["0", "1", "7", "1", "2", "3", "4", "5", "6", "7", "8"], rapid: true },
+          { text: "Confirm number. Hash. ", keys: ["#"] },
+        ],
+        6: [
+          { text: "Send invoice. Press ", keys: [] },
+          { text: "hash.", keys: ["#"] },
+        ],
+      },
+      bn: {
+        1: [
+          { text: "ডায়াল করুন, ", keys: [] },
+          { text: "স্টার, ", keys: ["*"] },
+          { text: "দুই, ", keys: ["2"] },
+          { text: "চার, ", keys: ["4"] },
+          { text: "সাত, ", keys: ["7"] },
+          { text: "হ্যাশ। ", keys: ["#"] },
+          { text: "ইউ, এস, এস, ডি, সংযোগ সফল। সেশন চালু হয়েছে।", keys: [] },
+        ],
+        2: [
+          { text: "ধান নির্বাচন, চাপুন ", keys: [] },
+          { text: "এক। ", keys: ["1"] },
+        ],
+        3: [
+          { text: "পরিমাণ, ", keys: [] },
+          { text: "পাঁচ, ", keys: ["5"] },
+          { text: "শূন্য। নিশ্চিত, ", keys: ["0"] },
+          { text: "হ্যাশ। ", keys: ["#"] },
+        ],
+        4: [
+          { text: "দাম প্রতি কেজি, ", keys: [] },
+          { text: "চার, ", keys: ["4"] },
+          { text: "দুই। নিশ্চিত, ", keys: ["2"] },
+          { text: "হ্যাশ। ", keys: ["#"] },
+        ],
+        5: [
+          { text: "ক্রেতার মোবাইল নম্বর লিখুন। ", keys: [] },
+          { text: "", keys: ["0", "1", "7", "1", "2", "3", "4", "5", "6", "7", "8"], rapid: true },
+          { text: "নম্বর নিশ্চিত, হ্যাশ। ", keys: ["#"] },
+        ],
+        6: [
+          { text: "চালান পাঠাতে, চাপুন ", keys: [] },
+          { text: "হ্যাশ। ", keys: ["#"] },
+        ],
+      },
+    };
+
     let demoIndex = 0;
     let keyBuffer = "";
     let demoRunning = false;
@@ -1572,33 +1648,88 @@
       return new Promise((r) => setTimeout(r, ms));
     }
 
+    function updateDialLcd(step, buffer) {
+      if (step === 1 && buffer.length) {
+        setScreen([buffer + "<span class='cursor'>_</span>", "KrishiBill"]);
+      } else if (step === 3 && buffer.length) {
+        setScreen(["Qty:", buffer.replace("#", ""), buffer.includes("#") ? "OK" : ""]);
+      } else if (step === 4 && buffer.length) {
+        setScreen(["Price/kg:", buffer.replace("#", ""), buffer.includes("#") ? "Total: 2100" : ""]);
+      } else if (step === 5 && buffer.length) {
+        setScreen(["Buyer mobile:", buffer.replace("#", ""), buffer.includes("#") ? "Sending…" : ""]);
+      }
+    }
+
+    async function pressKeysSynced(keys, step, opts) {
+      const useBn = voiceBnEl && voiceBnEl.checked;
+      const rapid = opts && opts.rapid;
+      const gap = rapid ? (useBn ? 240 : 200) : (useBn ? 300 : 240);
+      for (const k of keys) {
+        pressKeyVisual(k);
+        keyBuffer += k;
+        updateDialLcd(step, keyBuffer);
+        await sleep(gap);
+      }
+    }
+
+    async function runPhoneBlockSync(block) {
+      const useBn = voiceBnEl && voiceBnEl.checked;
+      const lang = useBn ? "bn" : "en";
+      const script = PHONE_DEMO_SYNC[lang][block.step];
+      const leadMs = voiceEnabled() ? (useBn ? 150 : 110) : 0;
+      const tailMs = useBn ? 400 : 320;
+
+      setRailStep(block.step, { silent: true });
+      keyBuffer = "";
+
+      if (!script) {
+        for (const k of block.keys) {
+          pressKeyVisual(k);
+          keyBuffer += k;
+          updateDialLcd(block.step, keyBuffer);
+          await sleep(useBn ? 280 : 220);
+        }
+        setScreen(block.screen);
+        await speakIVR(block.step);
+        return;
+      }
+
+      for (const seg of script) {
+        const keys = seg.keys || [];
+        const hasText = seg.text && seg.text.trim().length > 0;
+        let speechDone = Promise.resolve();
+        if (hasText) {
+          speechDone = speakQueued(seg.text, { banner: true });
+          if (keys.length && !seg.rapid) await sleep(leadMs);
+        }
+        if (keys.length) {
+          await pressKeysSynced(keys, block.step, { rapid: seg.rapid || !hasText });
+        }
+        if (hasText) await speechDone;
+        else if (!keys.length) await sleep(80);
+      }
+
+      setScreen(block.screen);
+      await sleep(tailMs);
+
+      if (block.step === 6) {
+        showBuyerSms();
+        await speakIVR(5);
+        await speakIVR(6);
+      }
+    }
+
     async function runDemo() {
       if (demoRunning) return;
       demoRunning = true;
       flushSpeech();
       resetPhone();
-      const useBn = voiceBnEl && voiceBnEl.checked;
-      const keyPause = useBn ? 320 : 260;
       await sleep(350);
       await speakIVR(0);
       for (const block of DEMO_SEQUENCE) {
-        setRailStep(block.step, { silent: true });
-        await speakIVR(block.step);
-        await sleep(useBn ? 200 : 120);
-        for (const k of block.keys) {
-          pressKeyVisual(k);
-          keyBuffer += k;
-          if (block.step === 1 && keyBuffer.includes("*247#")) {
-            setScreen(["*247#<span class='cursor'>_</span>"]);
-            await sleep(320);
-          }
-          await sleep(keyPause);
-        }
-        setScreen(block.screen);
-        await sleep(useBn ? 480 : 380);
-        keyBuffer = "";
+        await runPhoneBlockSync(block);
       }
-      showBuyerSms();
+      if (!document.getElementById("buyer-sms")?.classList.contains("show")) showBuyerSms();
       demoRunning = false;
     }
 
