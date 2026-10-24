@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Two Stories, One Digital Bangladesh</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&family=Noto+Sans+Bengali:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="vendor/reveal.js/reveal.css" />
+  <link rel="stylesheet" href="vendor/reveal.js/white.css" />
+  <style>
+    :root {
+      --navy: #003d66;
+      --navy-light: #0a5a8c;
+      --green: #006a4e;
+      --red: #c0392b;
+      --gold: #b8860b;
+      --surface: #eef3f8;
+      --phone-body: #2a2a2e;
+      --lcd-bg: #9cb87a;
+      --lcd-text: #1a2f0a;
+      --radius: 12px;
+    }
+    html, body { height: 100%; margin: 0; overflow: hidden; }
+    .reveal-viewport { overflow: hidden !important; }
+
+    .reveal { font-family: "DM Sans", system-ui, sans-serif; color: #1a1a1a; }
+    .reveal h1, .reveal h2, .reveal h3 { font-family: "DM Sans", sans-serif; text-transform: none; letter-spacing: -0.02em; }
+    .reveal h1 { font-size: clamp(1.2em, 4vw, 1.65em); color: var(--navy); }
+    .reveal h2 {
+      font-size: clamp(0.95em, 2.8vw, 1.15em);
+      color: white;
+      background: linear-gradient(105deg, var(--navy), var(--navy-light));
+      margin: 0 0 0.4em 0;
+      padding: 0.38em 0.65em;
+      border-radius: 8px;
+      line-height: 1.25;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .reveal h3 { font-size: 0.9em; color: var(--navy); margin: 0.35em 0; }
+    .reveal .bn { font-family: "Noto Sans Bengali", sans-serif; }
+    .reveal .slides { text-align: left; }
+    .reveal .slides > section {
+      text-align: left;
+      box-sizing: border-box;
+      padding: 0.25em 0.5em 0.35em !important;
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch;
+    }
+    .reveal .slides > section.center-slide { text-align: center; }
+    .reveal .slides > section.center-slide .slide-inner { text-align: center; width: 100%; }
+    .slide-inner {
+      width: 100%;
+      max-width: 100%;
+    }
+    .reveal ul, .reveal ol { font-size: clamp(0.52em, 1.6vw, 0.64em); margin: 0.2em 0; }
+    .reveal li { margin-bottom: 0.28em; line-height: 1.35; }
+    .cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.65em;
+      align-items: start;
+      width: 100%;
+    }
+    .cols-55 { grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); }
+    @media (max-width: 700px), (max-height: 520px) {
+      .cols, .cols-55, .compare-china, .three-cols { grid-template-columns: 1fr; }
+      .feature-phone { transform: scale(0.88); transform-origin: top center; }
+    }
+    body.deck-compact .story-panel { font-size: 0.62em; padding: 0.6em 0.75em; }
+    body.deck-compact .card { font-size: 0.58em; margin: 0.25em 0; }
+    body.deck-compact .proto-body { min-height: 140px; }
+    body.deck-compact .process-rail { font-size: 0.46em; }
+    body.deck-compact #slide-trail-proto .cols { grid-template-columns: 1fr; }
+    .lead { font-size: 0.62em; color: var(--navy-light); font-weight: 600; margin-bottom: 0.45em; }
+    .act-tag {
+      display: inline-block; font-size: 0.48em; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--green); border: 1px solid var(--green);
+      border-radius: 999px; padding: 0.2em 0.65em; margin-bottom: 0.35em;
+    }
+    .act-tag.problem { color: var(--red); border-color: var(--red); }
+    .act-tag.solve { color: var(--navy); border-color: var(--navy); }
+    .act-tag proto { color: var(--gold); border-color: var(--gold); }
+
+    .story-panel {
+      background: linear-gradient(145deg, #fff 0%, var(--surface) 100%);
+      border-radius: var(--radius); padding: 0.65em 0.85em; font-size: clamp(0.58em, 1.7vw, 0.68em);
+      line-height: 1.55; border: 1px solid rgba(0,61,102,0.12);
+      box-shadow: 0 8px 28px rgba(0,61,102,0.07);
+      position: relative; overflow: hidden;
+    }
+    .story-panel::before {
+      content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+      background: var(--green);
+    }
+    .story-panel.alt::before { background: var(--navy); }
+    .story-char { font-weight: 700; color: var(--navy); }
+    .story-time { font-size: 0.85em; color: #666; font-style: italic; }
+
+    .card {
+      background: white; border-radius: var(--radius); border-left: 4px solid var(--navy);
+      padding: 0.6em 0.85em; margin: 0.4em 0; font-size: 0.68em;
+      box-shadow: 0 2px 10px rgba(0,61,102,0.06);
+    }
+    .card.warn { border-left-color: var(--gold); background: #fffbf0; }
+    .card.danger { border-left-color: var(--red); background: #fff5f5; }
+    .card.green { border-left-color: var(--green); background: #f4faf7; }
+    .card h4 { margin: 0 0 0.3em; color: var(--navy); font-size: 1.05em; }
+
+    .timeline { font-size: 0.58em; margin: 0.5em 0; }
+    .timeline-item {
+      display: grid; grid-template-columns: 5.5em 1fr; gap: 0.6em; padding: 0.35em 0;
+      border-bottom: 1px dashed #ddd; align-items: start;
+    }
+    .timeline-item .when { font-weight: 700; color: var(--navy); }
+
+    /* ——— Feature phone ——— */
+    .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.4em; }
+    .phone-hint { font-size: 0.48em; color: #666; text-align: center; max-width: 14em; }
+    .feature-phone {
+      width: 168px; background: var(--phone-body); border-radius: 22px;
+      padding: 10px 10px 14px; box-shadow: 0 16px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .phone-earpiece { width: 36px; height: 5px; background: #111; border-radius: 3px; margin: 0 auto 6px; }
+    .phone-screen-wrap {
+      background: #1a1a1c; border-radius: 8px; padding: 5px; margin-bottom: 8px;
+    }
+    .phone-status {
+      display: flex; justify-content: space-between; font-size: 7px; color: #8a8; padding: 0 3px 2px;
+      font-family: "IBM Plex Mono", monospace;
+    }
+    .phone-status .g2 { color: #6cfc6c; animation: blink2g 2s step-end infinite; }
+    @keyframes blink2g { 50% { opacity: 0.5; } }
+    .phone-lcd {
+      background: var(--lcd-bg); min-height: 72px; border-radius: 4px; padding: 6px 7px;
+      font-family: "IBM Plex Mono", "Noto Sans Bengali", monospace;
+      font-size: 9px; line-height: 1.35; color: var(--lcd-text);
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.15);
+      transition: opacity 0.15s;
+    }
+    .phone-lcd.flash { animation: lcdFlash 0.12s ease; }
+    @keyframes lcdFlash { 50% { opacity: 0.7; } }
+    .phone-lcd .line-dial { letter-spacing: 0.05em; }
+    .phone-lcd .cursor { animation: cursorBlink 0.9s step-end infinite; }
+    @keyframes cursorBlink { 50% { opacity: 0; } }
+
+    .phone-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+    .phone-key {
+      aspect-ratio: 1; border: none; border-radius: 50%; background: linear-gradient(180deg, #4a4a50 0%, #323238 100%);
+      color: #eee; font-size: 13px; font-weight: 600; cursor: pointer;
+      box-shadow: 0 3px 0 #1a1a1e, 0 4px 8px rgba(0,0,0,0.3);
+      transition: transform 0.05s, box-shadow 0.05s; user-select: none; touch-action: manipulation;
+      font-family: "DM Sans", sans-serif;
+    }
+    .phone-key small { display: block; font-size: 6px; font-weight: 400; color: #aaa; letter-spacing: 0.02em; }
+    .phone-key:active, .phone-key.pressed {
+      transform: translateY(3px); box-shadow: 0 0 0 #1a1a1e, 0 1px 3px rgba(0,0,0,0.3);
+      background: linear-gradient(180deg, #5a5a62 0%, #3a3a42 100%);
+    }
+    .phone-key.wide { grid-column: span 1; border-radius: 8px; aspect-ratio: auto; height: 28px; }
+    .phone-key.action { background: linear-gradient(180deg, #3d5a3d, #2a402a); }
+    .phone-key.call { background: linear-gradient(180deg, #2d6a4f, #1b4332); grid-column: 2; border-radius: 8px; aspect-ratio: auto; height: 28px; }
+
+    .process-rail {
+      font-size: 0.52em; margin-top: 0.5em; padding-left: 0.2em;
+    }
+    .process-step {
+      display: flex; align-items: flex-start; gap: 0.45em; margin-bottom: 0.35em;
+      opacity: 0.35; transform: translateX(-4px); transition: all 0.35s ease;
+    }
+    .process-step.live { opacity: 1; transform: none; color: var(--navy); font-weight: 600; }
+    .process-step.done { opacity: 0.65; }
+    .process-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0; margin-top: 0.25em;
+    }
+    .process-step.live .process-dot { background: var(--green); box-shadow: 0 0 0 3px rgba(0,106,78,0.25); animation: dotPulse 1s ease infinite; }
+    .process-step.done .process-dot { background: var(--navy); }
+    @keyframes dotPulse { 50% { transform: scale(1.15); } }
+
+    .sms-out {
+      margin-top: 0.5em; font-size: 0.55em; max-width: 220px;
+      background: #1e1e1e; color: #b8f0b0; border-radius: 10px 10px 10px 2px;
+      padding: 0.55em 0.65em; opacity: 0; transform: scale(0.9) translateY(8px);
+      transition: all 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
+    }
+    .sms-out.show { opacity: 1; transform: none; }
+
+    /* Prototype dashboard */
+    .proto-window {
+      background: #0f1419; border-radius: 10px; overflow: hidden; font-size: 0.5em;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.2); border: 1px solid #333;
+    }
+    .proto-titlebar {
+      background: #1a2332; padding: 0.4em 0.6em; display: flex; align-items: center; gap: 0.35em;
+      color: #8ab; font-family: "IBM Plex Mono", monospace;
+    }
+    .proto-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .proto-body { display: grid; grid-template-columns: 1fr 1.2fr; gap: 0; min-height: 165px; }
+    .proto-cam {
+      background: linear-gradient(180deg, #0a0a0a 0%, #1a1a22 100%);
+      position: relative; display: flex; align-items: center; justify-content: center;
+      overflow: hidden; min-height: 150px;
+    }
+    .dummy-face {
+      width: 72px; height: 88px; position: relative; z-index: 1;
+      transition: filter 0.4s ease, transform 0.4s ease;
+    }
+    .dummy-face svg { width: 100%; height: 100%; display: block; }
+    .face-frame {
+      position: absolute; width: 82px; height: 98px; border: 2px solid #555; border-radius: 6px;
+      z-index: 2; pointer-events: none; transition: border-color 0.35s, box-shadow 0.35s;
+    }
+    .proto-cam.phase-scan .face-frame {
+      border-color: #ffcc00;
+      box-shadow: 0 0 16px rgba(255, 204, 0, 0.45);
+      animation: framePulse 0.8s ease-in-out infinite;
+    }
+    .proto-cam.phase-match .face-frame {
+      border-color: #00ff88;
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.55);
+    }
+    @keyframes framePulse {
+      50% { transform: scale(1.02); }
+    }
+    .proto-cam.phase-match .dummy-face { filter: drop-shadow(0 0 8px rgba(0,255,136,0.6)); }
+    .scan-line {
+      position: absolute; left: 8%; right: 8%; height: 3px;
+      background: linear-gradient(90deg, transparent, rgba(0,255,120,0.9), transparent);
+      z-index: 3; opacity: 0; top: 20%;
+    }
+    .proto-cam.phase-scan .scan-line {
+      opacity: 1;
+      animation: scanLine 1.4s ease-in-out infinite;
+    }
+    @keyframes scanLine { from { top: 18%; } to { top: 82%; } }
+    .cam-status {
+      position: absolute; top: 6px; left: 6px; font-size: 9px; font-family: "IBM Plex Mono", monospace;
+      color: #f55; background: rgba(0,0,0,0.65); padding: 2px 5px; border-radius: 3px; z-index: 4;
+    }
+    .cam-status.rec { color: #f55; animation: recBlink 1s step-end infinite; }
+    @keyframes recBlink { 50% { opacity: 0.4; } }
+    .cam-corner {
+      position: absolute; font-size: 8px; color: #6a8; font-family: "IBM Plex Mono", monospace;
+      z-index: 4;
+    }
+    .cam-corner.br { bottom: 6px; right: 6px; }
+    .proto-pipeline {
+      display: flex; gap: 4px; padding: 4px 6px; background: #0a0e14; border-top: 1px solid #333;
+      font-size: 8px; font-family: "IBM Plex Mono", monospace;
+    }
+    .pipe-step {
+      flex: 1; text-align: center; padding: 3px 2px; border-radius: 3px;
+      color: #567; background: #141a22; transition: all 0.35s;
+    }
+    .pipe-step.on { color: #0f8; background: #0f2a1a; font-weight: 600; }
+    .proto-side { padding: 0.5em; color: #cde; font-family: "IBM Plex Mono", monospace; font-size: 1.05em; }
+    .proto-match { color: #6f6; font-weight: 600; }
+    .proto-side-status { min-height: 2.2em; color: #9ab; margin-bottom: 0.35em; }
+    .proto-trail { margin-top: 0.35em; }
+    .trail-node {
+      padding: 0.25em 0; border-left: 2px solid #345; padding-left: 0.5em; margin-left: 0.2em;
+      opacity: 0; transform: translateX(-6px);
+    }
+    .trail-node.visible {
+      animation: trailIn 0.45s ease forwards;
+    }
+    @keyframes trailIn { to { opacity: 1; transform: none; } }
+
+    .proposal-box {
+      background: white; border: 2px solid var(--navy); border-radius: var(--radius);
+      padding: 0.65em; font-size: 0.62em;
+    }
+    .proposal-box h4 { margin: 0 0 0.35em; color: var(--navy); }
+    .budget-row { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 0.2em 0; }
+
+    table.compact { width: 100%; font-size: 0.55em; border-collapse: collapse; }
+    table.compact th { background: var(--navy); color: white; padding: 0.4em; }
+    table.compact td { border-bottom: 1px solid #ddd; padding: 0.35em; vertical-align: top; }
+
+    .roadmap { display: flex; gap: 0.3em; font-size: 0.48em; margin-top: 0.4em; }
+    .roadmap-phase {
+      flex: 1; text-align: center; padding: 0.45em 0.3em; background: var(--surface);
+      border-radius: 8px; border-top: 3px solid var(--navy);
+    }
+
+    .reveal .progress span { background: var(--navy); }
+    .demo-btn {
+      font-size: 0.48em; padding: 0.35em 0.75em; border-radius: 6px; border: none;
+      background: var(--navy); color: white; cursor: pointer; margin-top: 0.35em;
+    }
+    .demo-btn:hover { background: var(--navy-light); }
+
+    .compare-china { font-size: clamp(0.48em, 1.4vw, 0.55em); display: grid; grid-template-columns: 1fr 1fr; gap: 0.5em; }
+    .compare-china .side { padding: 0.45em; border-radius: 8px; }
+    .compare-china .cn { background: #fff0f0; border: 1px solid #ecc; }
+    .compare-china .bd { background: #f0f6ff; border: 1px solid #cde; }
+
+    /* Karim phone slide: phone + instructions stay side-by-side */
+    .phone-demo-layout {
+      display: grid;
+      grid-template-columns: minmax(140px, 36%) minmax(0, 1fr);
+      gap: 0.75em;
+      align-items: start;
+      width: 100%;
+    }
+    .phone-demo-device {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 0;
+    }
+    .phone-demo-guide {
+      min-width: 0;
+      border-left: 3px solid rgba(0, 106, 78, 0.35);
+      padding-left: 0.55em;
+    }
+    .guide-label {
+      margin: 0 0 0.4em;
+      font-size: 0.55em;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.3;
+    }
+    .phone-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35em;
+      justify-content: center;
+      width: 100%;
+      margin-top: 0.35em;
+    }
+    .phone-actions .demo-btn { flex: 1 1 auto; min-width: 0; }
+    #slide-phone-demo .process-rail {
+      max-height: 11em;
+      overflow-y: auto;
+      padding-right: 0.25em;
+      -webkit-overflow-scrolling: touch;
+    }
+    #slide-phone-demo .phone-wrap { transform-origin: top center; }
+    .scroll-hint {
+      font-size: 0.42em;
+      color: #999;
+      text-align: center;
+      margin-top: 0.25em;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .reveal .slides > section.is-scrollable .scroll-hint { opacity: 1; }
+    .reveal .slides section::-webkit-scrollbar { width: 5px; }
+    .reveal .slides section::-webkit-scrollbar-thumb { background: rgba(0,61,102,0.25); border-radius: 4px; }
+
+    /* ——— Mobile / touch ——— */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 200;
+      padding: 6px 10px calc(6px + env(safe-area-inset-bottom, 0px));
+      background: rgba(0, 45, 77, 0.96);
+      backdrop-filter: blur(8px);
+      gap: 8px;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+    }
+    body.mobile-deck .mobile-nav {
+      display: flex;
+      align-items: stretch;
+    }
+    .mobile-nav button {
+      flex: 1;
+      min-height: 46px;
+      border: none;
+      border-radius: 10px;
+      font-family: "DM Sans", system-ui, sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .mobile-nav .nav-prev,
+    .mobile-nav .nav-next {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+    }
+    .mobile-nav .nav-frag {
+      flex: 0.85;
+      background: var(--green);
+      color: #fff;
+    }
+    .mobile-nav .nav-prev:active,
+    .mobile-nav .nav-next:active,
+    .mobile-nav .nav-frag:active {
+      transform: scale(0.97);
+      opacity: 0.92;
+    }
+    body.mobile-deck .reveal .progress {
+      bottom: calc(54px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+    body.mobile-deck .reveal .slide-number {
+      top: 6px !important;
+      bottom: auto !important;
+      right: 8px !important;
+      left: auto !important;
+      font-size: 12px;
+    }
+    body.mobile-deck .cols,
+    body.mobile-deck .cols-55,
+    body.mobile-deck .compare-china {
+      grid-template-columns: 1fr !important;
+      gap: 0.5em;
+    }
+    body.mobile-deck .timeline { font-size: 0.85rem; }
+    body.mobile-deck .timeline-item {
+      grid-template-columns: 1fr;
+      gap: 0.15em;
+    }
+    body.mobile-deck .roadmap { flex-wrap: wrap; }
+    body.mobile-deck .roadmap-phase { min-width: 42%; flex: 1 1 40%; }
+    body.mobile-deck .feature-phone {
+      transform: scale(1);
+      width: min(168px, 42vw);
+    }
+    body.mobile-deck .phone-key {
+      font-size: 16px;
+      min-height: 44px;
+    }
+    body.mobile-deck .demo-btn {
+      font-size: 14px;
+      min-height: 44px;
+      padding: 0.5em 1em;
+      width: 100%;
+      max-width: 280px;
+    }
+    body.mobile-deck #slide-phone-demo .phone-demo-layout {
+      grid-template-columns: 34% 66% !important;
+      gap: 0.35em;
+    }
+    body.mobile-deck #slide-phone-demo .guide-label {
+      font-size: 0.65rem;
+      margin-bottom: 0.25em;
+    }
+    body.mobile-deck #slide-phone-demo .feature-phone {
+      width: 100%;
+      max-width: 118px;
+      padding: 6px 7px 8px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    }
+    body.mobile-deck #slide-phone-demo .phone-lcd {
+      min-height: 48px;
+      font-size: 6.5px;
+      padding: 4px 5px;
+    }
+    body.mobile-deck #slide-phone-demo .phone-status { font-size: 5.5px; }
+    body.mobile-deck #slide-phone-demo .phone-keypad { gap: 3px; }
+    body.mobile-deck #slide-phone-demo .phone-key {
+      font-size: 10px;
+      min-height: 0;
+      aspect-ratio: 1;
+    }
+    body.mobile-deck #slide-phone-demo .phone-key small { font-size: 4px; }
+    body.mobile-deck #slide-phone-demo .phone-actions {
+      flex-direction: column;
+      margin-top: 0.25em;
+    }
+    body.mobile-deck #slide-phone-demo .phone-actions .demo-btn {
+      font-size: 9px;
+      min-height: 32px;
+      padding: 0.25em 0.35em;
+      width: 100%;
+      max-width: none;
+    }
+    body.mobile-deck #slide-phone-demo .phone-hint { display: none; }
+    body.mobile-deck #slide-phone-demo .process-rail {
+      max-height: 42vh;
+      font-size: 0.62rem;
+      line-height: 1.25;
+    }
+    body.mobile-deck #slide-phone-demo .process-step { margin-bottom: 0.2em; }
+    body.mobile-deck #slide-phone-demo .process-dot {
+      width: 6px;
+      height: 6px;
+      margin-top: 0.35em;
+    }
+    body.mobile-deck #slide-phone-demo .sms-out {
+      max-width: 100%;
+      font-size: 0.58rem;
+      margin-top: 0.3em;
+      padding: 0.4em 0.45em;
+    }
+    body.mobile-deck #slide-phone-demo h2 {
+      font-size: 0.92rem;
+      line-height: 1.2;
+    }
+    body.mobile-deck #slide-phone-demo .phone-demo-guide {
+      padding-left: 0.35em;
+    }
+    body.mobile-deck .proto-body {
+      grid-template-columns: 1fr;
+      max-height: none;
+    }
+    body.mobile-deck .proto-cam { min-height: 120px; }
+    body.mobile-deck table.compact { font-size: 0.68em; display: block; overflow-x: auto; }
+    body.mobile-deck .scroll-hint {
+      font-size: 11px;
+      color: var(--navy-light);
+    }
+    body.mobile-deck .reveal-viewport {
+      background: #fff;
+      padding-bottom: 0;
+      height: calc(100dvh - var(--mobile-nav-h, 58px)) !important;
+      max-height: calc(100dvh - var(--mobile-nav-h, 58px)) !important;
+    }
+    body.mobile-deck .reveal {
+      width: 100% !important;
+      height: 100% !important;
+      font-size: 16px !important;
+    }
+    body.mobile-deck .reveal .controls {
+      display: none !important;
+    }
+    body.mobile-deck .reveal .slides {
+      width: 100% !important;
+      height: 100% !important;
+    }
+    body.mobile-deck .reveal .slides > section {
+      padding: 0.35em 0.65em 0.75em !important;
+      height: 100% !important;
+      top: 0 !important;
+    }
+    body.mobile-deck .slide-inner {
+      font-size: 15px;
+      line-height: 1.45;
+    }
+    body.mobile-deck .reveal h1 { font-size: 1.45rem; margin-bottom: 0.35em; }
+    body.mobile-deck .reveal h2 { font-size: 1.08rem; }
+    body.mobile-deck .reveal ul,
+    body.mobile-deck .reveal ol { font-size: 0.92rem; }
+    body.mobile-deck .story-panel,
+    body.mobile-deck .card,
+    body.mobile-deck .proposal-box { font-size: 0.9rem; }
+    body.mobile-deck .act-tag { font-size: 10px; }
+    body.mobile-deck .lead { font-size: 0.85rem; }
+    body.mobile-deck .compare-china { font-size: 0.88rem; }
+    body.mobile-deck table.compact { font-size: 0.8rem; }
+    body.mobile-deck .desktop-only-hint { display: none !important; }
+    body.mobile-deck .mobile-only-hint { display: block !important; }
+    body.mobile-deck .scroll-hint { display: none; }
+    body.mobile-deck .reveal .slides > section.is-scrollable .scroll-hint { display: block; }
+    body.mobile-deck .reveal .slides > section.center-slide .slide-inner {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: calc(100% - 8px);
+      box-sizing: border-box;
+    }
+    body.mobile-deck .mobile-nav {
+      box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .deck-toolbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 250;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      padding-top: calc(6px + env(safe-area-inset-top, 0px));
+      background: rgba(255, 255, 255, 0.97);
+      border-bottom: 1px solid rgba(0, 61, 102, 0.18);
+      font-family: "DM Sans", system-ui, sans-serif;
+      font-size: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    }
+    .deck-toolbar button,
+    .deck-toolbar select {
+      font-family: inherit;
+      font-size: 12px;
+      min-height: 34px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 61, 102, 0.25);
+      background: #fff;
+      color: var(--navy);
+      padding: 0 10px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .deck-toolbar button.primary {
+      background: var(--navy);
+      color: #fff;
+      border-color: var(--navy);
+    }
+    .deck-toolbar select { max-width: min(220px, 42vw); }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+    }
+    .deck-toolbar label.voice-opts {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: #444;
+      margin-left: auto;
+    }
+    body.mobile-deck .deck-toolbar label.voice-opts { margin-left: 0; width: 100%; }
+    body.mobile-deck .deck-toolbar { font-size: 11px; gap: 4px; }
+    body.mobile-deck .deck-toolbar button,
+    body.mobile-deck .deck-toolbar select { min-height: 38px; font-size: 11px; }
+    body.has-toolbar .reveal-viewport {
+      padding-top: var(--toolbar-h, 48px);
+      box-sizing: border-box;
+    }
+    .ivr-banner {
+      display: none;
+      font-size: 10px;
+      color: var(--green);
+      font-weight: 600;
+      margin-top: 0.25em;
+      text-align: center;
+    }
+    .ivr-banner.on { display: block; }
+    body.mobile-deck #slide-phone-demo .ivr-banner { font-size: 9px; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- TITLE -->
+      <section class="center-slide" data-transition="zoom">
+        <p class="act-tag" style="font-size:0.55em">Interactive proposal deck</p>
+        <h1>Two Stories, One Digital Bangladesh</h1>
+        <p style="font-size:0.58em;color:#555;max-width:28em;margin:0.5em auto 0">
+          We begin with people—not technology. Then we look at <strong>today</strong>, name the <strong>problem</strong>, and show a <strong>prototype solution</strong> you can build.
+        </p>
+        <div class="desktop-only-hint" style="font-size:0.52em;margin-top:1.2em;color:#888">Press → · On the phone slide, tap keys or click “Run demo”</div>
+        <p class="mobile-only-hint" style="display:none;font-size:0.85rem;margin-top:1em;color:#666">Use the bottom bar: Prev · Reveal step · Next</p>
+      </section>
+
+      <!-- STORY 1 -->
+      <section>
+        <span class="act-tag">Story · Scenario I</span>
+        <h2>Karim’s morning in Tangail</h2>
+        <div class="cols">
+          <div class="story-panel fragment fade-up">
+            <p class="story-time">5:40 AM · Bhatgram village · 2G only on a button phone</p>
+            <p><span class="story-char">Karim Mia</span> loads <span class="bn">৫০ মন ধান</span> onto a van for <span class="story-char">Rahim Uddin</span>, a rice trader in Mirpur. They agreed on <span class="bn">৪২ টাকা</span> per kg yesterday—verbally, with no written record.</p>
+            <p style="margin-top:0.5em">Rahim calls: <em>“Send me proof before the van leaves. My accountant needs Bangla details.”</em> Karim has no smartphone, no bKash app on device, and spotty literacy in English SMS templates.</p>
+          </div>
+          <div class="fragment fade-up">
+            <div class="card danger">
+              <h4>What happens today (typical)</h4>
+              <ul>
+                <li>Handwritten note on paper—lost, disputed, or unreadable after rain</li>
+                <li>Voice call only—no itemized price, no receipt ID, no tax trail</li>
+                <li>Smartphone apps exist (bKash merchant) but <strong>exclude this handset</strong></li>
+                <li>Cooperative ledgers updated days later at union office</li>
+              </ul>
+            </div>
+            <p class="lead">Karim’s world runs on voice + SMS—not apps.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- STORY 2 -->
+      <section>
+        <span class="act-tag">Story · Scenario II</span>
+        <h2>Anwar’s crate at Chittagong port</h2>
+        <div class="cols">
+          <div class="story-panel alt fragment fade-up">
+            <p class="story-time">11 PM · Port gate · CCTV exists, systems do not talk</p>
+            <p><span class="story-char">Anwar Hossain</span>, an garments accessories trader, clears a crate marked <strong>AH-4471</strong>. By morning it is rerouted to the wrong bonded warehouse. His paper challan matches—digitally, nothing links the crate to his face, his NID, or the truck that moved it.</p>
+            <p style="margin-top:0.5em">Police ask for proof of custody. Port CCTV has footage; NID database has his photo; customs has a scan log—but <strong>no one query</strong> connects them in time across districts.</p>
+          </div>
+          <div class="fragment fade-up">
+            <div class="card danger">
+              <h4>What happens today (typical)</h4>
+              <ul>
+                <li>Biometric NID photos—not wired to live port face search</li>
+                <li>CCTV vendors differ; footage stays local</li>
+                <li>Challan partly digital, partly paper; gaps between weighbridge &amp; warehouse</li>
+                <li>Cross-ministry data sharing is manual, slow, or blocked</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHINA STORY -->
+      <section>
+        <span class="act-tag">Story · China (contrast)</span>
+        <h2>Li Wei’s evening at Guangzhou Baiyun Airport</h2>
+        <div class="cols">
+          <div class="story-panel fragment fade-up" style="--story-accent: var(--navy)">
+            <p class="story-time">9:15 PM · Terminal 2 · Return from Frankfurt</p>
+            <p><span class="story-char">Li Wei</span>, a textile machinery buyer, rolls his suitcase toward the domestic transfer gate. He has no boarding pass printout—only his passport and a WeChat health code from years ago. He is not thinking about technology.</p>
+            <p style="margin-top:0.45em">A ceiling camera captures his face. In under <strong>four seconds</strong>, the border system matches him to his national travel ID: last entry (March), hotel registration in Shenzhen, high-speed rail ticket to Guangzhou South, and the duty-free purchase he forgot he made.</p>
+            <p style="margin-top:0.45em">When his suitcase fails to appear on the carousel, staff at the baggage desk type his passport number—or simply confirm the face match on their screen. The bag’s tag, linked to the same identity graph, shows it was misloaded to Hangzhou. A redirect is ordered before Li Wei reaches the complaint counter.</p>
+          </div>
+          <div class="fragment fade-up">
+            <div class="card green">
+              <h4>What the story shows (systems, not magic)</h4>
+              <ul>
+                <li><strong>Face 1:N</strong> at the gate, tied to lawful identity records</li>
+                <li><strong>One graph</strong> for travel, lodging, tickets, and baggage events</li>
+                <li><strong>Staff tools</strong> that answer “who is this and what moved with them?” quickly</li>
+                <li><strong>Policy + plumbing</strong> built over years—not a single app download</li>
+              </ul>
+            </div>
+            <div class="card warn" style="margin-top:0.4em">
+              <h4>Bridge to Bangladesh</h4>
+              <p style="margin:0">Anwar at Chittagong has cameras and NID too—but without a fused graph and query broker, his crate story stops at the first silo. TrailGuard is a <em>proposal</em> to build that pipe lawfully, not copy every policy choice.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- JOURNEY MAP -->
+      <section class="center-slide">
+        <h2>How each scenario unfolds in this deck</h2>
+        <div style="font-size:0.62em;max-width:640px;margin:0 auto;text-align:left">
+          <div class="timeline">
+            <div class="timeline-item fragment fade-up"><span class="when">1 · Story</span><span>Meet Karim &amp; Anwar—real constraints on 2G and national logistics</span></div>
+            <div class="timeline-item fragment fade-up"><span class="when">2 · Today</span><span>Current Bangladesh scenario in detail (not skipped)</span></div>
+            <div class="timeline-item fragment fade-up"><span class="when">3 · Problem</span><span>Why paper, silos, and app-only design fail these users</span></div>
+            <div class="timeline-item fragment fade-up"><span class="when">4 · Prototype</span><span>Interactive phone demo + TrailGuard console mock</span></div>
+            <div class="timeline-item fragment fade-up"><span class="when">5 · Proposal</span><span>Architecture, partners, phased pilot &amp; budget outline</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- S1 TODAY -->
+      <section>
+        <span class="act-tag">Scenario I · Today</span>
+        <h2>Rural commerce on 2G—current reality</h2>
+        <div class="cols">
+          <ul>
+            <li class="fragment fade-up"><strong>Devices:</strong> Tens of millions of feature phones; voice + SMS + USSD; GPRS often off or unused</li>
+            <li class="fragment fade-up"><strong>Language:</strong> Business done in Bangla; official SMS often English or numeric codes</li>
+            <li class="fragment fade-up"><strong>Payments:</strong> bKash/Nagad widespread but usually need smartphone or agent—not field invoice from Karim’s phone</li>
+            <li class="fragment fade-up"><strong>Records:</strong> Cooperatives, NGOs, and buyers want digital audit trails farmers cannot produce at gate</li>
+          </ul>
+          <div class="card warn fragment fade-up">
+            <h4>What 2G button phones already support</h4>
+            <ul>
+              <li><strong>USSD</strong> menus (*123# style)—session-based, no internet</li>
+              <li><strong>SMS</strong>—outbound invoice to any mobile</li>
+              <li><strong>IVR</strong>—Bangla voice menus (operator-hosted)</li>
+              <li><strong>STK</strong> on some SIMs (limited)—not assumed for Karim</li>
+            </ul>
+            <p style="margin-top:0.4em;font-size:0.95em"><strong>Gap:</strong> No national “Krishi receipt” pipe tying these channels to a trusted ledger.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- S1 PROBLEM -->
+      <section>
+        <span class="act-tag problem">Scenario I · Problem</span>
+        <h2>Why Karim still cannot send a proper invoice</h2>
+        <div class="cols">
+          <div>
+            <ol>
+              <li class="fragment fade-up"><strong>App bias:</strong> Product teams design for Android; Karim is invisible in requirements</li>
+              <li class="fragment fade-up"><strong>Fragmented USSD:</strong> Each pilot uses a different short code; no open SDK for cooperatives</li>
+              <li class="fragment fade-up"><strong>Bangla gap:</strong> Amounts, units (<span class="bn">মন, কেজি</span>), and legal wording not standardized in SMS</li>
+              <li class="fragment fade-up"><strong>Trust gap:</strong> Buyer cannot verify SMS came from Karim vs spoofed sender</li>
+              <li class="fragment fade-up"><strong>Connectivity:</strong> USSD timeout when tower load spikes at harvest season</li>
+            </ol>
+          </div>
+          <div class="story-panel fragment fade-up" style="font-size:0.65em">
+            <p><strong>Karim’s pain in one line:</strong></p>
+            <p style="font-size:1.1em;color:var(--red);font-weight:600">“Van is leaving. I have 30 seconds and twelve buttons—not an app store.”</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- S1 SOLUTION -->
+      <section>
+        <span class="act-tag solve">Scenario I · Proposed solution</span>
+        <h2>KrishiBill—USSD + Bangla SMS ledger</h2>
+        <div class="cols cols-55">
+          <div>
+            <div class="card green">
+              <h4>Concept</h4>
+              Farmer dials <code>*247#</code> → structured sale → server signs receipt → buyer gets Bangla SMS with ID &amp; optional pay link.
+            </div>
+            <ul class="fragment fade-up">
+              <li>SIM registered to cooperative member (light identity)</li>
+              <li>Receipt hash in footer—buyer verifies via missed call or SMS back</li>
+              <li>Union edge cache if uplink fails; sync when GPRS available</li>
+            </ul>
+            <div class="roadmap fragment fade-up">
+              <div class="roadmap-phase"><strong>Telco</strong><br>USSD + SMPP</div>
+              <div class="roadmap-phase"><strong>API</strong><br>Ledger service</div>
+              <div class="roadmap-phase"><strong>Edge</strong><br>Union node</div>
+            </div>
+          </div>
+          <div class="proposal-box fragment fade-up">
+            <h4>Pilot proposal (6 months · one upazila)</h4>
+            <div class="budget-row"><span>1 cooperative · 200 farmers</span><span>Phase A</span></div>
+            <div class="budget-row"><span>USSD short code + SMS bundle</span><span>Operator MOU</span></div>
+            <div class="budget-row"><span>Ledger + Bangla templates</span><span>Dev team</span></div>
+            <div class="budget-row"><span>Success metric</span><span>80% receipts &lt; 2 min</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- S1 INTERACTIVE PHONE -->
+      <section data-auto-animate id="slide-phone-demo">
+        <span class="act-tag proto">Scenario I · Prototype</span>
+        <h2>Try it: Karim presses keys on his 2G phone</h2>
+        <div class="phone-demo-layout">
+          <div class="phone-demo-device">
+            <div class="feature-phone" id="demo-phone">
+              <div class="phone-earpiece"></div>
+              <div class="phone-screen-wrap">
+                <div class="phone-status">
+                  <span>Grameenphone</span>
+                  <span class="g2">2G ▮▮▯</span>
+                  <span>07:12</span>
+                </div>
+                <div class="phone-lcd" id="phone-lcd" aria-live="polite">
+                  <div>Ready</div>
+                  <div class="bn">কৃষিবিল</div>
+                </div>
+              </div>
+              <div class="phone-keypad" id="phone-keypad">
+                <button type="button" class="phone-key" data-key="1">1</button>
+                <button type="button" class="phone-key" data-key="2">2<small>ABC</small></button>
+                <button type="button" class="phone-key" data-key="3">3<small>DEF</small></button>
+                <button type="button" class="phone-key" data-key="4">4<small>GHI</small></button>
+                <button type="button" class="phone-key" data-key="5">5<small>JKL</small></button>
+                <button type="button" class="phone-key" data-key="6">6<small>MNO</small></button>
+                <button type="button" class="phone-key" data-key="7">7<small>PQRS</small></button>
+                <button type="button" class="phone-key" data-key="8">8<small>TUV</small></button>
+                <button type="button" class="phone-key" data-key="9">9<small>WXYZ</small></button>
+                <button type="button" class="phone-key action" data-key="*">*</button>
+                <button type="button" class="phone-key" data-key="0">0</button>
+                <button type="button" class="phone-key action" data-key="#">#</button>
+              </div>
+            </div>
+            <div class="phone-actions">
+              <button type="button" class="demo-btn" id="run-phone-demo">▶ Run demo</button>
+              <button type="button" class="demo-btn" id="reset-phone-demo" style="background:#666">Reset</button>
+            </div>
+            <p class="phone-hint">Tap keys — steps update on the right →</p>
+            <p class="ivr-banner" id="ivr-banner" aria-live="polite">🔊 IVR speaking…</p>
+          </div>
+          <div class="phone-demo-guide">
+            <p class="guide-label">Instructions (live as keys are pressed)</p>
+            <div class="process-rail" id="process-rail">
+              <div class="process-step" data-step="0"><span class="process-dot"></span><span>Idle — open KrishiBill</span></div>
+              <div class="process-step" data-step="1"><span class="process-dot"></span><span>Dial <code>*247#</code> · USSD session</span></div>
+              <div class="process-step" data-step="2"><span class="process-dot"></span><span>Press <strong>1</strong> · <span class="bn">ধান</span> (paddy)</span></div>
+              <div class="process-step" data-step="3"><span class="process-dot"></span><span>Enter <strong>50</strong> · kg</span></div>
+              <div class="process-step" data-step="4"><span class="process-dot"></span><span>Enter <strong>42</strong> · price/kg</span></div>
+              <div class="process-step" data-step="5"><span class="process-dot"></span><span>Buyer mobile · confirm <strong>#</strong></span></div>
+              <div class="process-step" data-step="6"><span class="process-dot"></span><span>Signed receipt · SMS to Rahim</span></div>
+            </div>
+            <div class="sms-out" id="buyer-sms">
+              <strong>To: Rahim</strong><br>
+              <span class="bn">ধান ৫০ কেজি × ৪২ = ২,১০০ টাকা</span><br>
+              ID: KB-2026-8842 · Karim Mia<br>
+              Verify: miss call 09600123456
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- S1 DEV -->
+      <section>
+        <span class="act-tag solve">Scenario I · Build</span>
+        <h2>What developers &amp; infrastructure provide</h2>
+        <div class="cols">
+          <ul>
+            <li class="fragment fade-up"><strong>USSD gateway</strong> — map telco XML/session → your REST API</li>
+            <li class="fragment fade-up"><strong>Bangla layer</strong> — Unicode SMS, Bengali numerals, unit dictionary</li>
+            <li class="fragment fade-up"><strong>Signing service</strong> — HMAC receipt ID; anti-spoof sender registry with operator</li>
+            <li class="fragment fade-up"><strong>Co-op dashboard</strong> — web app for exports (not on farmer phone)</li>
+          </ul>
+          <div class="card fragment fade-up">
+            <h4>Infrastructure checklist</h4>
+            <ul>
+              <li>Commercial SMS route + dedicated short code</li>
+              <li>BDIX-hosted API (latency &amp; data residency)</li>
+              <li>Optional union Raspberry Pi / mini-PC store-and-forward</li>
+              <li>IVR fallback for low-literacy users (Bangla TTS)</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- S2 TODAY -->
+      <section>
+        <span class="act-tag">Scenario II · Today</span>
+        <h2>After Li Wei’s airport—where Bangladesh stands</h2>
+        <div class="compare-china fragment fade-up">
+          <div class="side cn">
+            <strong>Li Wei (Guangzhou)—what worked in the story</strong>
+            <ul>
+              <li>Gate face match → national travel identity in seconds</li>
+              <li>Baggage tag + person linked in one staff view</li>
+              <li>Cross-city redirect triggered from fused events</li>
+            </ul>
+          </div>
+          <div class="side bd">
+            <strong>Anwar (Chittagong)—typical today</strong>
+            <ul>
+              <li>NID biometrics exist; live port face search not unified</li>
+              <li>CCTV records locally; vendors don’t share one index</li>
+              <li>Challan partly digital; crate ↔ face ↔ truck rarely one query</li>
+              <li>Agencies hold data; manual handoffs cost days</li>
+            </ul>
+          </div>
+        </div>
+        <table class="compact fragment fade-up" style="margin-top:0.5em">
+          <tr><th>Layer</th><th>Current state</th><th>Missing link</th></tr>
+          <tr><td>Identity</td><td>NID photo, passport chips</td><td>Real-time face embed search at logistics nodes</td></tr>
+          <tr><td>Video</td><td>Local DVRs</td><td>Federated index + edge GPU embed</td></tr>
+          <tr><td>Goods</td><td>Challan, partial ASYCUDA</td><td>MovementEvent stream with actor ID</td></tr>
+        </table>
+      </section>
+
+      <!-- S2 PROBLEM -->
+      <section>
+        <span class="act-tag problem">Scenario II · Problem</span>
+        <h2>Why Anwar’s crate vanishes in the data</h2>
+        <ol style="font-size:0.65em">
+          <li class="fragment fade-up"><strong>No shared person ID</strong> across NID, phone, trader TIN, and port pass</li>
+          <li class="fragment fade-up"><strong>Face match not operational</strong> at gate—not because algorithms absent, but pipes &amp; policy aren’t</li>
+          <li class="fragment fade-up"><strong>Events not streamed</strong>—scans sit in silos until manual investigation</li>
+          <li class="fragment fade-up"><strong>Recovery is reactive</strong>—days of DVD exports instead of one graph query</li>
+        </ol>
+        <div class="story-panel alt fragment fade-up" style="font-size:0.62em;margin-top:0.5em">
+          <strong>Anwar:</strong> “The camera saw me. NID knows me. Why can’t the system answer where crate AH-4471 went?”
+        </div>
+      </section>
+
+      <!-- S2 SOLUTION -->
+      <section>
+        <span class="act-tag solve">Scenario II · Proposed solution</span>
+        <h2>TrailGuard—lawful national logistics graph</h2>
+        <div class="cols">
+          <div class="card green">
+            <h4>Concept</h4>
+            Cameras &amp; scanners emit signed events → face embed service (scoped) → query broker returns <em>ranked trails</em> for a case ID—not open surveillance.
+          </div>
+          <ul class="fragment fade-up">
+            <li><strong>Detect → embed → match</strong> at edge; raw video short retention</li>
+            <li><strong>Entity graph:</strong> <code>person_id</code> ↔ crate ↔ vehicle ↔ location</li>
+            <li><strong>Query broker:</strong> customs/police submit warrant/case token</li>
+            <li><strong>Human review</strong> for matches below confidence threshold</li>
+          </ul>
+        </div>
+        <div class="proposal-box fragment fade-up" style="margin-top:0.5em">
+          <h4>Pilot proposal (12 months · port–highway corridor)</h4>
+          <div class="budget-row"><span>3 sites: gate, weighbridge, bonded WH</span><span>Phase B–C</span></div>
+          <div class="budget-row"><span>ONVIF + embed appliances</span><span>Infra</span></div>
+          <div class="budget-row"><span>Event bus + 2 legacy adapters</span><span>Dev</span></div>
+          <div class="budget-row"><span>Metric</span><span>Recovery query &lt; 15 min (pilot)</span></div>
+        </div>
+      </section>
+
+      <!-- S2 PROTOTYPE -->
+      <section id="slide-trail-proto">
+        <span class="act-tag proto">Scenario II · Prototype</span>
+        <h2>TrailGuard console (mock)—Anwar’s case AH-4471</h2>
+        <div class="cols">
+          <div class="proto-window fragment fade-up" id="trail-console">
+            <div class="proto-titlebar">
+              <span class="proto-dot" style="background:#f55"></span>
+              <span class="proto-dot" style="background:#fb0"></span>
+              <span class="proto-dot" style="background:#5f5"></span>
+              TrailGuard · Case #CTG-2026-991 · AUTHORIZED
+            </div>
+            <div class="proto-body">
+              <div style="display:flex;flex-direction:column">
+                <div class="proto-cam" id="proto-cam">
+                  <span class="cam-status rec" id="cam-status">● LIVE</span>
+                  <span class="cam-corner br">GATE 3 · CTG</span>
+                  <div class="dummy-face" id="dummy-face" aria-hidden="true">
+                    <svg viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <ellipse cx="50" cy="58" rx="38" ry="46" fill="#3d4f5f" stroke="#5a7080" stroke-width="2"/>
+                      <ellipse cx="50" cy="52" rx="32" ry="38" fill="#d4a574"/>
+                      <ellipse cx="38" cy="48" rx="5" ry="6" fill="#2a2218"/>
+                      <ellipse cx="62" cy="48" rx="5" ry="6" fill="#2a2218"/>
+                      <path d="M42 62 Q50 70 58 62" stroke="#8b6914" stroke-width="2" fill="none" stroke-linecap="round"/>
+                      <path d="M28 35 Q50 18 72 35" stroke="#4a3828" stroke-width="6" fill="none" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                  <div class="face-frame" id="face-frame"></div>
+                  <div class="scan-line" id="scan-line"></div>
+                </div>
+                <div class="proto-pipeline" id="proto-pipeline">
+                  <span class="pipe-step" data-pipe="0">1 Detect</span>
+                  <span class="pipe-step" data-pipe="1">2 Embed</span>
+                  <span class="pipe-step" data-pipe="2">3 Match NID</span>
+                  <span class="pipe-step" data-pipe="3">4 Trail</span>
+                </div>
+              </div>
+              <div class="proto-side">
+                <div class="proto-side-status" id="proto-side-status">Waiting for gate camera…</div>
+                <div id="proto-match-line" style="opacity:0.3">Match: —</div>
+                <div class="proto-trail" id="proto-trail">
+                  <div class="trail-node" data-i="0">22:14 Gate 3 scan + face</div>
+                  <div class="trail-node" data-i="1">22:41 Truck CTG-GA-4471 ANPR</div>
+                  <div class="trail-node" data-i="2">01:08 Bond WH (wrong route) RFID</div>
+                  <div class="trail-node" data-i="3">→ Alert sent to customs officer</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:0.58em">
+            <p class="lead">Dummy face + staged pipeline (proposal mock).</p>
+            <ul>
+              <li>Yellow box = scanning · green = NID match</li>
+              <li>Trail nodes appear after match step</li>
+              <li>Same flow Anwar would need for crate AH-4471</li>
+            </ul>
+            <button type="button" class="demo-btn" id="replay-trail">↻ Replay face scan demo</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- S3 UNIFY -->
+      <section>
+        <span class="act-tag solve">Scenario III · Unified vision</span>
+        <h2>One trust layer—from field receipt to port trail</h2>
+        <div class="cols">
+          <ol style="font-size:0.62em">
+            <li class="fragment fade-up"><strong>KrishiBill receipt</strong> becomes a signed logistics event (buyer opt-in)</li>
+            <li class="fragment fade-up"><strong>Same entity ID</strong> ties cooperative farmer SIM to trader NID where lawful</li>
+            <li class="fragment fade-up"><strong>Disputes</strong> at warehouse: challan + face + SMS receipt ID</li>
+            <li class="fragment fade-up"><strong>Open sandbox API</strong> for universities &amp; startups</li>
+          </ol>
+          <div class="roadmap fragment fade-up">
+            <div class="roadmap-phase">A<br>KrishiBill USSD</div>
+            <div class="roadmap-phase">B<br>Face at 3 nodes</div>
+            <div class="roadmap-phase">C<br>Federated search</div>
+            <div class="roadmap-phase">D<br>Air &amp; land borders</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CLOSE -->
+      <section class="center-slide" data-background-color="#003d66" data-scrollable="true">
+        <h2 style="background:none;color:white;margin:0;border-radius:0">Proposal summary</h2>
+        <div style="font-size:0.58em;color:rgba(255,255,255,0.9);max-width:520px;margin:1em auto;text-align:left">
+          <p><strong>KrishiBill</strong> — 2G-native Bangla invoices for Karim.</p>
+          <p><strong>TrailGuard</strong> — lawful face + event graph for Anwar’s goods.</p>
+          <p><strong>Together</strong> — rural connectivity first, national trust when data can be linked responsibly.</p>
+        </div>
+        <p style="font-size:0.48em;color:rgba(255,255,255,0.45);margin-top:1.5em">← → slides · Phone slide: tap keys or Run demo · F fullscreen</p>
+      </section>
+
+    </div>
+  </div>
+
+  <div class="deck-toolbar" id="deck-toolbar" role="toolbar" aria-label="Presentation controls">
+    <button type="button" class="primary" id="deck-home" title="Slide 1">⏮ Start</button>
+    <button type="button" id="deck-refresh" title="Reload deck">↻ Refresh</button>
+    <label>
+      <span class="sr-only">Jump to slide</span>
+      <select id="deck-jump" aria-label="Jump to slide"></select>
+    </label>
+    <label class="voice-opts">
+      <input type="checkbox" id="voice-ivr" checked /> IVR voice
+      <input type="checkbox" id="voice-bn" /> Bangla
+    </label>
+  </div>
+
+  <nav class="mobile-nav" aria-label="Slide navigation">
+    <button type="button" class="nav-prev" id="nav-prev">‹ Prev</button>
+    <button type="button" class="nav-frag" id="nav-frag">Reveal step</button>
+    <button type="button" class="nav-next" id="nav-next">Next ›</button>
+  </nav>
+
+  <script src="vendor/reveal.js/reveal.js"></script>
+  <script>
+    if (typeof Reveal === "undefined") {
+      document.body.innerHTML =
+        "<div style=\"font-family:system-ui;padding:2rem;max-width:32rem;margin:auto\">" +
+        "<h1>Deck failed to load</h1><p>Reveal.js did not load. Open the file from " +
+        "<code>bd-digital-deck/index.html</code> or redeploy with the <code>vendor/</code> folder.</p></div>";
+      throw new Error("Reveal missing");
+    }
+    function wrapSlides() {
+      document.querySelectorAll(".reveal .slides > section").forEach((section) => {
+        if (section.querySelector(":scope > .slide-inner")) return;
+        const inner = document.createElement("div");
+        inner.className = "slide-inner";
+        const hint = document.createElement("p");
+        hint.className = "scroll-hint";
+        hint.textContent = "Scroll this slide if content is clipped ↓";
+        while (section.firstChild) inner.appendChild(section.firstChild);
+        section.appendChild(inner);
+        section.appendChild(hint);
+      });
+    }
+    wrapSlides();
+
+    const MOBILE_MAX = 768;
+    const mobileMq = window.matchMedia(`(max-width: ${MOBILE_MAX}px)`);
+
+    function mobileNavHeight() {
+      const nav = document.querySelector(".mobile-nav");
+      return nav ? nav.offsetHeight : 58;
+    }
+
+    function isMobileDeck() {
+      return window.innerWidth <= MOBILE_MAX;
+    }
+
+    function deckDimensions() {
+      if (isMobileDeck()) {
+        const w = document.documentElement.clientWidth || window.innerWidth;
+        const h = Math.max(480, (window.innerHeight || 700) - mobileNavHeight());
+        return { width: Math.round(w), height: Math.round(h), margin: 0, minScale: 1, maxScale: 1 };
+      }
+      return { width: 1280, height: 720, margin: 0.05, minScale: 0.2, maxScale: 1 };
+    }
+
+    function applyMobileClass() {
+      document.body.classList.toggle("mobile-deck", isMobileDeck());
+      document.documentElement.style.setProperty("--mobile-nav-h", mobileNavHeight() + "px");
+      document.querySelectorAll(".scroll-hint").forEach((el) => {
+        el.textContent = isMobileDeck()
+          ? "Scroll inside slide · use bottom bar to change slides"
+          : "Scroll this slide if content is clipped ↓";
+      });
+    }
+
+    const dim = deckDimensions();
+    applyMobileClass();
+
+    Reveal.initialize({
+      hash: true,
+      slideNumber: "c/t",
+      transition: isMobileDeck() ? "fade" : "slide",
+      center: false,
+      width: dim.width,
+      height: dim.height,
+      margin: dim.margin,
+      minScale: dim.minScale,
+      maxScale: dim.maxScale,
+      touch: true,
+      scrollActivationWidth: isMobileDeck() ? null : 80,
+      help: false,
+    });
+
+    function relayoutDeck() {
+      applyMobileClass();
+      const d = deckDimensions();
+      Reveal.configure({
+        width: d.width,
+        height: d.height,
+        margin: d.margin,
+        minScale: d.minScale,
+        maxScale: d.maxScale,
+        transition: isMobileDeck() ? "fade" : "slide",
+      });
+      Reveal.layout();
+      layoutPass();
+    }
+
+    mobileMq.addEventListener("change", relayoutDeck);
+    window.addEventListener("orientationchange", () => setTimeout(relayoutDeck, 350));
+
+    function tuneLayout() {
+      const scale = Reveal.getScale();
+      document.body.classList.toggle("deck-compact", !isMobileDeck() && scale < 0.72);
+    }
+
+    function markScrollableSlides() {
+      document.querySelectorAll(".reveal .slides > section").forEach((section) => {
+        const needsScroll = section.scrollHeight > section.clientHeight + 6;
+        section.classList.toggle("is-scrollable", needsScroll);
+      });
+    }
+
+    function layoutPass() {
+      tuneLayout();
+      markScrollableSlides();
+    }
+
+    Reveal.on("ready", layoutPass);
+    Reveal.on("resize", layoutPass);
+
+    function navPrev() { Reveal.prev(); }
+    function navNext() { Reveal.next(); }
+    function navFrag() {
+      if (!Reveal.nextFragment()) Reveal.next();
+    }
+
+    document.getElementById("nav-prev").addEventListener("click", (e) => { e.stopPropagation(); navPrev(); });
+    document.getElementById("nav-next").addEventListener("click", (e) => { e.stopPropagation(); navNext(); });
+    document.getElementById("nav-frag").addEventListener("click", (e) => { e.stopPropagation(); navFrag(); });
+
+    Reveal.on("ready", () => {
+      if (isMobileDeck()) relayoutDeck();
+      initDeckToolbar();
+    });
+
+    document.body.classList.add("has-toolbar");
+    function updateToolbarHeight() {
+      const tb = document.getElementById("deck-toolbar");
+      if (tb) document.documentElement.style.setProperty("--toolbar-h", tb.offsetHeight + "px");
+    }
+    window.addEventListener("resize", updateToolbarHeight);
+
+    /* ——— IVR / voice (Web Speech API) ——— */
+    const ivrBanner = document.getElementById("ivr-banner");
+    const voiceIvrEl = document.getElementById("voice-ivr");
+    const voiceBnEl = document.getElementById("voice-bn");
+
+    const IVR_LINES = {
+      en: {
+        0: "Welcome to Krishi Bill. Dial star two four seven hash to begin.",
+        1: "U S S D connected. Krishi Bill session started.",
+        2: "Paddy selected. Enter quantity: fifty kilograms.",
+        3: "Price entered: forty two taka per kilogram. Total two thousand one hundred.",
+        4: "Enter buyer mobile number, then press hash to confirm.",
+        5: "Invoice sent. Receipt number K B eight eight four two. SMS delivered to Rahim.",
+        6: "Transaction complete. Thank you.",
+      },
+      bn: {
+        0: "কৃষিবিলে স্বাগতম। শুরু করতে স্টার ২৪৭ হ্যাশ চাপুন।",
+        1: "ইউএসএসডি সংযুক্ত। কৃষিবিল সেশন শুরু হয়েছে।",
+        2: "ধান নির্বাচন হয়েছে। পরিমাণ পঞ্চাশ কিলোগ্রাম লিখুন।",
+        3: "দাম প্রতি কেজি ৪২ টাকা। মোট ২১০০ টাকা।",
+        4: "ক্রেতার মোবাইল নম্বর দিন। নিশ্চিত করতে হ্যাশ চাপুন।",
+        5: "চালান পাঠানো হয়েছে। রসিদ নম্বর K B ৮৮৪২। রহিমের কাছে এসএমএস গেছে।",
+        6: "লেনদেন সম্পন্ন। ধন্যবাদ।",
+      },
+    };
+
+    function voiceEnabled() {
+      return voiceIvrEl && voiceIvrEl.checked && "speechSynthesis" in window;
+    }
+
+    function pickVoice(langPrefix) {
+      const voices = window.speechSynthesis.getVoices();
+      return voices.find((v) => v.lang && v.lang.toLowerCase().startsWith(langPrefix)) || null;
+    }
+
+    function speakIVR(step) {
+      if (!voiceEnabled()) return Promise.resolve();
+      const useBn = voiceBnEl && voiceBnEl.checked;
+      const lang = useBn ? "bn" : "en";
+      const text = (IVR_LINES[lang] && IVR_LINES[lang][step]) || IVR_LINES.en[step];
+      if (!text) return Promise.resolve();
+      window.speechSynthesis.cancel();
+      return new Promise((resolve) => {
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = useBn ? "bn-BD" : "en-IN";
+        u.rate = 0.9;
+        u.pitch = 1;
+        const v = pickVoice(useBn ? "bn" : "en");
+        if (v) u.voice = v;
+        if (ivrBanner) {
+          ivrBanner.classList.add("on");
+          ivrBanner.textContent = useBn ? "🔊 IVR (বাংলা)…" : "🔊 IVR speaking…";
+        }
+        u.onend = () => {
+          if (ivrBanner) ivrBanner.classList.remove("on");
+          resolve();
+        };
+        u.onerror = () => {
+          if (ivrBanner) ivrBanner.classList.remove("on");
+          resolve();
+        };
+        window.speechSynthesis.speak(u);
+      });
+    }
+
+    function speakTrail(text) {
+      if (!voiceEnabled()) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "en-IN";
+      u.rate = 0.95;
+      window.speechSynthesis.speak(u);
+    }
+
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.onvoiceschanged = () => pickVoice("bn");
+      window.speechSynthesis.getVoices();
+    }
+
+    /* ——— Deck toolbar: start, refresh, jump ——— */
+    function buildJumpMenu() {
+      const sel = document.getElementById("deck-jump");
+      if (!sel) return;
+      const idx = Reveal.getIndices().h;
+      sel.innerHTML = "";
+      document.querySelectorAll(".reveal .slides > section").forEach((sec, i) => {
+        const h = sec.querySelector("h2, h1");
+        let title = h ? h.textContent.trim() : "Slide " + (i + 1);
+        if (title.length > 42) title = title.slice(0, 40) + "…";
+        const opt = document.createElement("option");
+        opt.value = String(i);
+        opt.textContent = (i + 1) + ". " + title;
+        if (i === idx) opt.selected = true;
+        sel.appendChild(opt);
+      });
+    }
+
+    function syncJumpMenu(indexH) {
+      const sel = document.getElementById("deck-jump");
+      if (sel && sel.value !== String(indexH)) sel.value = String(indexH);
+    }
+
+    function resetAllDemos() {
+      resetPhone();
+      resetTrailDemo();
+      window.speechSynthesis?.cancel();
+      if (ivrBanner) ivrBanner.classList.remove("on");
+    }
+
+    function initDeckToolbar() {
+      updateToolbarHeight();
+      buildJumpMenu();
+      document.getElementById("deck-home").addEventListener("click", (e) => {
+        e.stopPropagation();
+        resetAllDemos();
+        Reveal.slide(0);
+        syncJumpMenu(0);
+      });
+      document.getElementById("deck-refresh").addEventListener("click", (e) => {
+        e.stopPropagation();
+        const base = location.pathname + location.search;
+        location.href = base + "#/" + Reveal.getIndices().h;
+        location.reload();
+      });
+      document.getElementById("deck-jump").addEventListener("change", (e) => {
+        e.stopPropagation();
+        const i = parseInt(e.target.value, 10);
+        if (!Number.isNaN(i)) {
+          window.speechSynthesis?.cancel();
+          Reveal.slide(i);
+        }
+      });
+      ["voice-ivr", "voice-bn"].forEach((id) => {
+        document.getElementById(id)?.addEventListener("change", (e) => e.stopPropagation());
+      });
+    }
+
+    /* ——— KrishiBill phone simulator ——— */
+    const lcd = document.getElementById("phone-lcd");
+    const rail = document.getElementById("process-rail");
+    const buyerSms = document.getElementById("buyer-sms");
+    const keypad = document.getElementById("phone-keypad");
+
+    const DEMO_SEQUENCE = [
+      { keys: ["*", "2", "4", "7", "#"], step: 1, screen: ["Connecting USSD...", "KrishiBill", "Session: KB-001"] },
+      { keys: ["1"], step: 2, screen: ["1. <span class='bn'>ধান</span> (Paddy)", "2. Mustard", "3. Veg", "Select:"] },
+      { keys: ["5", "0", "#"], step: 3, screen: ["Qty (kg):", "50", "OK? 1=Yes"] },
+      { keys: ["4", "2", "#"], step: 4, screen: ["Price/kg:", "42 BDT", "Total: 2100"] },
+      { keys: ["0", "1", "7", "1", "2", "3", "4", "5", "6", "7", "8", "#"], step: 5, screen: ["Buyer mobile:", "01712345678", "Send? #=Yes"] },
+      { keys: ["#"], step: 6, screen: ["<span class='bn'>পাঠানো হয়েছে!</span>", "Sent!", "SMS OK", "Receipt KB-8842"] },
+    ];
+
+    let demoIndex = 0;
+    let keyBuffer = "";
+    let demoRunning = false;
+    let manualStep = 0;
+
+    function setRailStep(n, opts) {
+      rail.querySelectorAll(".process-step").forEach((el) => {
+        const s = parseInt(el.dataset.step, 10);
+        el.classList.remove("live", "done");
+        if (s < n) el.classList.add("done");
+        if (s === n) el.classList.add("live");
+      });
+      if (!opts || !opts.silent) speakIVR(n);
+    }
+
+    function flashLcd() {
+      lcd.classList.remove("flash");
+      void lcd.offsetWidth;
+      lcd.classList.add("flash");
+    }
+
+    function setScreen(lines) {
+      flashLcd();
+      lcd.innerHTML = lines.map((l) => `<div>${l}</div>`).join("");
+    }
+
+    function pressKeyVisual(key) {
+      const btn = keypad.querySelector(`[data-key="${key}"]`);
+      if (!btn) return;
+      btn.classList.add("pressed");
+      setTimeout(() => btn.classList.remove("pressed"), 120);
+    }
+
+    function showBuyerSms() {
+      buyerSms.classList.add("show");
+    }
+
+    function resetPhone() {
+      demoRunning = false;
+      demoIndex = 0;
+      keyBuffer = "";
+      manualStep = 0;
+      setScreen(["Ready", "<span class='bn'>কৃষিবিল</span>", "Dial *247#"]);
+      setRailStep(0, { silent: true });
+      buyerSms.classList.remove("show");
+    }
+
+    async function sleep(ms) {
+      return new Promise((r) => setTimeout(r, ms));
+    }
+
+    async function runDemo() {
+      if (demoRunning) return;
+      demoRunning = true;
+      resetPhone();
+      await sleep(400);
+      for (const block of DEMO_SEQUENCE) {
+        setRailStep(block.step);
+        await sleep(400);
+        for (const k of block.keys) {
+          pressKeyVisual(k);
+          keyBuffer += k;
+          if (block.step === 1 && keyBuffer.includes("*247#")) {
+            setScreen(["*247#<span class='cursor'>_</span>"]);
+            await sleep(350);
+          }
+          await sleep(280);
+        }
+        setScreen(block.screen);
+        await sleep(700);
+        keyBuffer = "";
+      }
+      showBuyerSms();
+      demoRunning = false;
+    }
+
+    function handleManualKey(key) {
+      if (demoRunning) return;
+      pressKeyVisual(key);
+      flashLcd();
+
+      if (manualStep === 0) {
+        keyBuffer += key;
+        setScreen([keyBuffer + "<span class='cursor'>_</span>", "KrishiBill"]);
+        if (keyBuffer === "*247#") {
+          manualStep = 1;
+          setRailStep(1);
+          keyBuffer = "";
+          setScreen(DEMO_SEQUENCE[0].screen);
+        }
+        return;
+      }
+      if (manualStep === 1 && key === "1") {
+        manualStep = 2;
+        setRailStep(2);
+        setScreen(DEMO_SEQUENCE[1].screen);
+        return;
+      }
+      if (manualStep === 2) {
+        keyBuffer += key;
+        if (key === "#") {
+          manualStep = 3;
+          setRailStep(3);
+          keyBuffer = "";
+          setScreen(DEMO_SEQUENCE[2].screen);
+        } else setScreen(["Qty:", keyBuffer.replace("#", "")]);
+        return;
+      }
+      if (manualStep === 3) {
+        keyBuffer += key;
+        if (key === "#") {
+          manualStep = 4;
+          setRailStep(4);
+          keyBuffer = "";
+          setScreen(DEMO_SEQUENCE[3].screen);
+        } else setScreen(["Price/kg:", keyBuffer.replace("#", "")]);
+        return;
+      }
+      if (manualStep === 4) {
+        keyBuffer += key;
+        if (key === "#") {
+          manualStep = 5;
+          setRailStep(5);
+          keyBuffer = "";
+          setScreen(["Buyer:", "01712345678", "# to send"]);
+        }
+        return;
+      }
+      if (manualStep === 5 && key === "#") {
+        manualStep = 6;
+        setRailStep(6);
+        setScreen(DEMO_SEQUENCE[5].screen);
+        showBuyerSms();
+      }
+    }
+
+    function stopRevealTouch(e) {
+      e.stopPropagation();
+    }
+    keypad.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const btn = e.target.closest(".phone-key");
+      if (btn) handleManualKey(btn.dataset.key);
+    });
+    keypad.addEventListener("touchstart", stopRevealTouch, { passive: true });
+    keypad.addEventListener("touchend", stopRevealTouch, { passive: true });
+    document.getElementById("demo-phone")?.addEventListener("touchstart", stopRevealTouch, { passive: true });
+    document.querySelectorAll(".demo-btn").forEach((btn) => {
+      btn.addEventListener("touchstart", stopRevealTouch, { passive: true });
+      btn.addEventListener("click", (e) => e.stopPropagation());
+    });
+
+    document.getElementById("run-phone-demo").addEventListener("click", runDemo);
+    document.getElementById("reset-phone-demo").addEventListener("click", resetPhone);
+
+    const protoCam = document.getElementById("proto-cam");
+    const protoStatus = document.getElementById("proto-side-status");
+    const protoMatchLine = document.getElementById("proto-match-line");
+    const pipeSteps = document.querySelectorAll("#proto-pipeline .pipe-step");
+    const trailNodes = document.querySelectorAll("#proto-trail .trail-node");
+    let trailDemoTimer = null;
+
+    function setPipe(n) {
+      pipeSteps.forEach((el, i) => el.classList.toggle("on", i <= n));
+    }
+
+    function resetTrailDemo() {
+      if (trailDemoTimer) clearTimeout(trailDemoTimer);
+      protoCam.classList.remove("phase-scan", "phase-match");
+      setPipe(-1);
+      protoStatus.textContent = "Waiting for gate camera…";
+      protoMatchLine.style.opacity = "0.3";
+      protoMatchLine.innerHTML = "Match: —";
+      trailNodes.forEach((n) => n.classList.remove("visible"));
+    }
+
+    async function runTrailDemo() {
+      resetTrailDemo();
+      await sleep(400);
+      protoCam.classList.add("phase-scan");
+      protoStatus.textContent = "Detecting face in frame…";
+      setPipe(0);
+      speakTrail("Detecting face at gate three.");
+      await sleep(1200);
+      setPipe(1);
+      protoStatus.textContent = "Embedding vector → national index…";
+      speakTrail("Embedding face vector. Searching national index.");
+      await sleep(1100);
+      protoCam.classList.remove("phase-scan");
+      protoCam.classList.add("phase-match");
+      setPipe(2);
+      protoStatus.textContent = "NID record linked · case scoped";
+      speakTrail("Match found. Anwar Hossain. Ninety four percent confidence.");
+      protoMatchLine.style.opacity = "1";
+      protoMatchLine.innerHTML = 'Match: <span class="proto-match">Anwar H. · 94.2%</span>';
+      await sleep(800);
+      setPipe(3);
+      protoStatus.textContent = "Graph query: crate AH-4471 + face F";
+      for (let i = 0; i < trailNodes.length; i++) {
+        await sleep(550);
+        trailNodes[i].classList.add("visible");
+      }
+      protoStatus.textContent = "Done — officer alert queued (audit log #8841)";
+    }
+
+    document.getElementById("replay-trail").addEventListener("click", runTrailDemo);
+
+    Reveal.on("slidechanged", (ev) => {
+      requestAnimationFrame(layoutPass);
+      syncJumpMenu(ev.indexh);
+      const id = ev.currentSlide.id;
+      if (id === "slide-phone-demo") {
+        resetPhone();
+        setTimeout(() => runDemo(), 800);
+      } else if (id === "slide-trail-proto") {
+        setTimeout(runTrailDemo, 500);
+      } else {
+        resetTrailDemo();
+      }
+    });
+
+    resetPhone();
+  </script>
+</body>
+</html>
