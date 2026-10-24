@@ -1645,7 +1645,7 @@
     }
 
     function resetAllDemos() {
-      flushSpeech();
+      stopSlideMediaAndDemos();
       resetPhone();
       resetTrailDemo();
     }
@@ -1669,7 +1669,7 @@
         e.stopPropagation();
         const i = parseInt(e.target.value, 10);
         if (!Number.isNaN(i)) {
-          flushSpeech();
+          stopSlideMediaAndDemos();
           Reveal.slide(i);
         }
       });
@@ -1804,6 +1804,32 @@
     let keyBuffer = "";
     let demoRunning = false;
     let manualStep = 0;
+    let phoneDemoRun = 0;
+    let trailDemoRun = 0;
+    let phoneSlideTimer = null;
+    let trailSlideTimer = null;
+
+    function isPhoneDemoRun(id) {
+      return id === phoneDemoRun;
+    }
+
+    function isTrailDemoRun(id) {
+      return id === trailDemoRun;
+    }
+
+    function stopSlideMediaAndDemos() {
+      flushSpeech();
+      phoneDemoRun += 1;
+      trailDemoRun += 1;
+      demoRunning = false;
+      if (phoneSlideTimer) clearTimeout(phoneSlideTimer);
+      if (trailSlideTimer) clearTimeout(trailSlideTimer);
+      phoneSlideTimer = null;
+      trailSlideTimer = null;
+      if (trailDemoTimer) clearTimeout(trailDemoTimer);
+      trailDemoTimer = null;
+      if (ivrBanner) ivrBanner.classList.remove("on");
+    }
 
     function setRailStep(n, opts) {
       rail.querySelectorAll(".process-step").forEach((el) => {
@@ -1936,13 +1962,27 @@
 
     async function runDemo() {
       if (demoRunning) return;
+      const runId = phoneDemoRun;
       demoRunning = true;
       flushSpeech();
       resetPhone();
       await sleep(350);
+      if (!isPhoneDemoRun(runId)) {
+        demoRunning = false;
+        return;
+      }
       await speakIVR(0);
+      if (!isPhoneDemoRun(runId)) {
+        demoRunning = false;
+        return;
+      }
       for (const block of DEMO_SEQUENCE) {
+        if (!isPhoneDemoRun(runId)) break;
         await runPhoneBlockSync(block);
+      }
+      if (!isPhoneDemoRun(runId)) {
+        demoRunning = false;
+        return;
       }
       if (!document.getElementById("buyer-sms")?.classList.contains("show")) showBuyerSms();
       demoRunning = false;
@@ -2058,51 +2098,71 @@
     }
 
     async function runTrailDemo() {
+      const runId = trailDemoRun;
       flushSpeech();
       resetTrailDemo();
       const useBn = voiceBnEl && voiceBnEl.checked;
       await sleep(350);
+      if (!isTrailDemoRun(runId)) return;
       protoCam.classList.add("phase-scan");
       protoStatus.textContent = "Detecting face in frame…";
       setPipe(0);
       await speakTrail(0);
+      if (!isTrailDemoRun(runId)) return;
       setPipe(1);
       protoStatus.textContent = "Embedding vector → national index…";
       await speakTrail(1);
+      if (!isTrailDemoRun(runId)) return;
       protoCam.classList.remove("phase-scan");
       protoCam.classList.add("phase-match");
       setPipe(2);
       protoStatus.textContent = "NID record linked · case scoped";
       await speakTrail(2);
+      if (!isTrailDemoRun(runId)) return;
       protoMatchLine.style.opacity = "1";
       protoMatchLine.innerHTML = 'Match: <span class="proto-match">Anwar H. · 94.2%</span>';
       await sleep(useBn ? 420 : 320);
+      if (!isTrailDemoRun(runId)) return;
       setPipe(3);
       protoStatus.textContent = "Graph query: crate AH-4471 + face F";
       for (let i = 0; i < trailNodes.length; i++) {
         await sleep(useBn ? 620 : 520);
+        if (!isTrailDemoRun(runId)) return;
         trailNodes[i].classList.add("visible");
       }
+      if (!isTrailDemoRun(runId)) return;
       protoStatus.textContent = "Done — officer alert queued (audit log #8841)";
     }
 
-    document.getElementById("replay-trail").addEventListener("click", runTrailDemo);
+    document.getElementById("replay-trail").addEventListener("click", (e) => {
+      e.stopPropagation();
+      stopSlideMediaAndDemos();
+      runTrailDemo();
+    });
 
     Reveal.on("slidechanged", (ev) => {
       requestAnimationFrame(layoutPass);
       syncJumpMenu(ev.indexh);
+      stopSlideMediaAndDemos();
       const id = ev.currentSlide.id;
       if (id === "slide-phone-demo") {
         resetPhone();
-        setTimeout(() => runDemo(), 800);
+        phoneSlideTimer = setTimeout(() => {
+          phoneSlideTimer = null;
+          runDemo();
+        }, 800);
       } else if (id === "slide-trail-proto") {
         resetTrailDemo();
         requestAnimationFrame(() => {
           void document.getElementById("proto-cam")?.offsetHeight;
         });
-        setTimeout(runTrailDemo, 180);
+        trailSlideTimer = setTimeout(() => {
+          trailSlideTimer = null;
+          runTrailDemo();
+        }, 180);
       } else {
         resetTrailDemo();
+        resetPhone();
       }
     });
 
